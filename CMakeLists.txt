@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(eutil)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # locate unpacked data dir and make it available
-include(cmake/unpacked_data_setup.cmake)
+include(cmake/path_setup.cmake)
 
 # sub projects defined in CMakeLists.txt files
 add_subdirectory(analysis)

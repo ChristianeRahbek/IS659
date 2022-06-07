@@ -3,8 +3,8 @@
   "detectors": [
     {
       "name": "U1",
-      "file": "U1.json",
-      "calibration": "U1.cal",
+      "file": "dssds/U1.json",
+      "calibration": "dssds/U1.cal",
       "position": {
         "x": "33.61 mm",
         "y": "-0.676 mm",
@@ -37,8 +37,8 @@
     },
     {
       "name": "U2",
-      "file": "U2.json",
-      "calibration": "U2.cal",
+      "file": "dssds/U2.json",
+      "calibration": "dssds/U2.cal",
       "position": {
         "x": "30.52 mm",
         "y": "-0.676 mm",
@@ -54,9 +54,16 @@
         "y": "1 mm",
         "z": "0 mm"
       },
-      "mapping": {
+      "frontMapping": {
         "prefix": "U2F",
         "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      },
+      "backMapping": {
+        "prefix": "U2B",
+        "tdc": "-DEAD-",
         "multiplicity": "",
         "segment": "I",
         "adc": "_E"
@@ -64,8 +71,8 @@
     },
     {
       "name": "U3",
-      "file": "U3.json",
-      "calibration": "U3.cal",
+      "file": "dssds/U3.json",
+      "calibration": "dssds/U3.cal",
       "position": {
         "x": "28.76 mm",
         "y": "0.502 mm",
@@ -98,8 +105,8 @@
     },
     {
       "name": "U4",
-      "file": "U4.json",
-      "calibration": "U4.cal",
+      "file": "dssds/U4.json",
+      "calibration": "dssds/U4.cal",
       "position": {
         "x": "-29.95 mm",
         "y": "-1.182 mm",
@@ -132,8 +139,8 @@
     },
     {
       "name": "P1",
-      "file": "P1.json",
-      "calibration": "P1.cal",
+      "file": "plastics/P1.json",
+      "calibration": "plastics/P1.cal",
       "position": {
         "x": "-33.83 mm",
         "y": "-1.182 mm",
@@ -150,14 +157,14 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P1T",
-        "adc": "P1E"
+        "tdc": "P1_T",
+        "adc": "P1_E"
       }
     },
     {
       "name": "P2",
-      "file": "P2.json",
-      "calibration": "P2.cal",
+      "file": "plastics/P2.json",
+      "calibration": "plastics/P2.cal",
       "position": {
         "x": "-31.32 mm",
         "y": "1.094 mm",
@@ -174,14 +181,14 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P2T",
-        "adc": "P2E"
+        "tdc": "P2_T",
+        "adc": "P2_E"
       }
     },
     {
       "name": "P3",
-      "file": "P3.json",
-      "calibration": "P3.cal",
+      "file": "plastics/P3.json",
+      "calibration": "plastics/P3.cal",
       "position": {
         "x": "32.65 mm",
         "y": "0.502 mm",
@@ -198,14 +205,14 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P3T",
-        "adc": "P3E"
+        "tdc": "P3_T",
+        "adc": "P3_E"
       }
     },
     {
       "name": "P4",
-      "file": "P4.json",
-      "calibration": "P4.cal",
+      "file": "plastics/P4.json",
+      "calibration": "plastics/P4.cal",
       "position": {
         "x": "32.65 mm",
         "y": "0.502 mm",
@@ -222,14 +229,14 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P3T",
-        "adc": "P3E"
+        "tdc": "P4_T",
+        "adc": "P4_E"
       }
     },
     {
       "name": "C1",
-      "file": "C1.json",
-      "calibration": "C1.cal",
+      "file": "clovers/C1.json",
+      "calibration": "clovers/C1.cal",
       "position": {
         "x": "-57.73 mm",
         "y": "57.73 mm",
@@ -247,16 +254,16 @@
       },
       "mapping": {
         "prefix": "C1",
-        "tdc": "T",
+        "tdc": "_T",
         "multiplicity": "",
         "segment": "I",
-        "adc": "E"
+        "adc": "_E"
       }
     },
     {
       "name": "C2",
-      "file": "C2.json",
-      "calibration": "C2.cal",
+      "file": "clovers/C2.json",
+      "calibration": "clovers/C2.cal",
       "position": {
         "x": "57.73 mm",
         "y": "57.73 mm",
@@ -274,16 +281,16 @@
       },
       "mapping": {
         "prefix": "C2",
-        "tdc": "T",
+        "tdc": "_T",
         "multiplicity": "",
         "segment": "I",
-        "adc": "E"
+        "adc": "_E"
       }
     },
     {
       "name": "C3",
-      "file": "C3.json",
-      "calibration": "C3.cal",
+      "file": "clovers/C3.json",
+      "calibration": "clovers/C3.cal",
       "position": {
         "x": "-57.73 mm",
         "y": "-57.73 mm",
@@ -301,16 +308,16 @@
       },
       "mapping": {
         "prefix": "C3",
-        "tdc": "T",
+        "tdc": "_T",
         "multiplicity": "",
         "segment": "I",
-        "adc": "E"
+        "adc": "_E"
       }
     },
     {
       "name": "C4",
-      "file": "C4.json",
-      "calibration": "C4.cal",
+      "file": "clovers/C4.json",
+      "calibration": "clovers/C4.cal",
       "position": {
         "x": "57.73 mm",
         "y": "-57.73 mm",
@@ -328,10 +335,10 @@
       },
       "mapping": {
         "prefix": "C4",
-        "tdc": "T",
+        "tdc": "_T",
         "multiplicity": "",
         "segment": "I",
-        "adc": "E"
+        "adc": "_E"
       }
     }
   ],

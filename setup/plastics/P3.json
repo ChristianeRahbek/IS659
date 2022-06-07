@@ -1,0 +1,7 @@
+{
+  "type" : "Pad",
+  "thickness" : "500um",
+  "deadLayer": "0.6um",
+  "upLength" : "50mm",
+  "transverseLength" : "50mm"
+}

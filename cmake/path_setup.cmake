@@ -6,6 +6,8 @@ if(NOT EXISTS ${unpacked_data_dir})
 endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/data
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/data/sorted
                 COMMAND ${CMAKE_COMMAND} -E create_symlink ${unpacked_data_dir}  ${CMAKE_SOURCE_DIR}/data/unpacked
                 COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/data  ${CMAKE_SOURCE_DIR}/analysis/data
-                COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/data  ${CMAKE_SOURCE_DIR}/calibration/data)
+                COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/data  ${CMAKE_SOURCE_DIR}/calibration/data
+                COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/setup  ${CMAKE_SOURCE_DIR}/calibration/setup)

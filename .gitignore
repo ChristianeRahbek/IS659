@@ -10,3 +10,4 @@ setup
 *.root
 elog.txt
 runs/
+cmake

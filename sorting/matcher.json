@@ -1,0 +1,52 @@
+{
+  "DSD" : {
+    "U1" : {
+      "front" : {
+        "disable" : [5, 7, 11],
+        "low_cut" : 200
+      },
+      "back" : {
+        "disable" : 8,
+        "low_cut" : 200
+      }
+    },
+    "U2" : {
+	"front" : {
+	"disable" : 11,
+	"low_cut" : 200
+	},
+	"back" : {
+	"disable" : [1, 16],
+	"low_cut" : 200
+	}
+    },
+    "U3" : {
+	"back" : {
+	"disable" : 7,
+	"low_cut" : 200
+	}
+    },
+    "U4" : {
+	"front" : {
+	"disable" : 16,
+	"low_cut" : 200
+	},
+	"back" : {
+	"disable" : [3, 6, 7, 13],
+	"low_cut" : 200
+	}
+    },
+    "__GLOBAL__" : {
+      "tolerance" : 200,
+      "low_cut" : 200,
+      "high_cut" : 10000
+    }
+  },
+  "SSD" : {
+    "__GLOBAL__" : {
+      "low_cut" : 200,
+      "high_cut" : 10000
+    }
+  }
+}
+

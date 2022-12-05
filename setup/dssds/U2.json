@@ -2,7 +2,7 @@
   "type" : "SquareDSSD",
   "nBackStrips" : 16,
   "nFrontStrips" : 16,
-  "thickness" :     "60um",
+  "thickness" :     "65um",
   "deadLayer" :     "0.1um",
   "deadLayer_back" : "0.6um",
   "backContactThickness" : "0.2um",

@@ -1,0 +1,44 @@
+# AUSAlib version: 17.1
+# Calibrator version: 2.0
+# Calibrator arguments: Calibrator -s ../setup/setup.json -k ../setup/calibration/4a.json -r 2 -b 13 -d U2 --eloss --gui
+# Input files: 
+#	../runs/Run212.root
+# Calibration of U2
+# Performed @ 2022-11-11 11:09
+# Performed by christiane on Christianes-pc
+# Front
+-11.078 0.981038
+-17.8611 1.00649
+-14.0909 1.01021
+-10.1743 1.02518
+-10.8577 0.961069
+-8.08852 1.02868
+-5.98551 8.78313
+-6.19988 1.01485
+-3.55096 1.02062
+-5.70918 0.991736
+# Slope or offset was either NaN or Inf and has been set to 0.0!
+0.0 0.0
+13.7539 0.940325
+25.694 0.994968
+28.3725 1.00336
+56.6595 1.02195
+112.277 1.05261
+# Back
+# Slope or offset was either NaN or Inf and has been set to 0.0!
+0.0 0.0
+-17.8756 1.02885
+-21.0703 0.980625
+-20.4694 1.00571
+-12.3465 0.992708
+-16.9051 0.975989
+-14.4096 0.976882
+-20.3418 1.0286
+-12.6579 0.997888
+-13.7742 0.99069
+-10.104 1.01081
+-12.3532 1.03038
+-9.57959 0.981848
+-10.2861 1.04551
+-15.1029 0.898602
+3122.02 7.71452

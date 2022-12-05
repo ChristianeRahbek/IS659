@@ -1,0 +1,39 @@
+
+  "DSD" : {
+    "U1" : {
+      "front" : {
+        "disable" : [5, 7, 11],
+        "low_cut" : 200
+      },
+      "back" : {
+        "disable" : 8,
+        "low_cut" : 200
+      }
+    },
+{
+  "DSD" : {
+    "SU" : {
+      "front" : {
+        "disable" : [2, 3],
+        "low_cut" : [100, 200, 300, 700, 900, 600]
+      },
+      "back" : {
+        "disable" : 7,
+        "low_cut" : 200
+      }
+    },
+    "__GLOBAL__" : {
+      "tolerance" : 200,
+      "low_cut" : 200,
+      "high_cut" : 10000
+    }
+  }
+}
+
+    "__GLOBAL__" : {
+      "tolerance" : 200,
+      "low_cut" : 200,
+      "high_cut" : 10000
+    }
+  }
+}

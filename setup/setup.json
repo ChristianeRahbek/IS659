@@ -2,13 +2,13 @@
   "name": "is659",
   "detectors": [
     {
-      "name": "U1",
-      "file": "dssds/U1.json",
-      "calibration": "dssds/U1.cal",
+      "name": "U4",
+      "file": "dssds/U4.json",
+      "calibration": "../finestructure_fit/calout/U4.cal",
       "position": {
-        "x": "33.61 mm",
-        "y": "-0.676 mm",
-        "z": "-32.49 mm"
+        "x": "26.79 mm",
+        "y": "-9.42 mm",
+        "z": "-26.79 mm"
       },
       "normal": {
         "x": "-1 mm",
@@ -16,9 +16,43 @@
         "z": "1 mm"
       },
       "orientation": {
-        "x": "-1 mm",
+        "x": "0 mm",
+        "y": "-1 mm",
+        "z": "0 mm"
+      },
+      "frontMapping": {
+        "prefix": "U4F",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      },
+      "backMapping": {
+        "prefix": "U4B",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "U1",
+      "file": "dssds/U1.json",
+      "calibration": "../finestructure_fit/calout/U1.cal",
+      "position": {
+        "x": "-26.61 mm",
+        "y": "-9.42 mm",
+        "z": "-26.61 mm"
+      },
+      "normal": {
+        "x": "1 mm",
         "y": "0 mm",
-        "z": "-1 mm"
+        "z": "1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "-1 mm",
+        "z": "0 mm"
       },
       "frontMapping": {
         "prefix": "U1F",
@@ -29,7 +63,7 @@
       },
       "backMapping": {
         "prefix": "U1B",
-        "tdc": "-DEAD-",
+        "tdc": "_T",
         "multiplicity": "",
         "segment": "I",
         "adc": "_E"
@@ -38,20 +72,20 @@
     {
       "name": "U2",
       "file": "dssds/U2.json",
-      "calibration": "dssds/U2.cal",
+      "calibration": "../finestructure_fit/calout/U2.cal",
       "position": {
-        "x": "30.52 mm",
-        "y": "-0.676 mm",
-        "z": "-29.40 mm"
+        "x": "-26.79 mm",
+        "y": "-9.42 mm",
+        "z": "26.79 mm"
       },
       "normal": {
-        "x": "-1 mm",
+        "x": "1 mm",
         "y": "0 mm",
-        "z": "1 mm"
+        "z": "-1 mm"
       },
       "orientation": {
         "x": "0 mm",
-        "y": "1 mm",
+        "y": "-1 mm",
         "z": "0 mm"
       },
       "frontMapping": {
@@ -63,7 +97,7 @@
       },
       "backMapping": {
         "prefix": "U2B",
-        "tdc": "-DEAD-",
+        "tdc": "_T",
         "multiplicity": "",
         "segment": "I",
         "adc": "_E"
@@ -72,11 +106,11 @@
     {
       "name": "U3",
       "file": "dssds/U3.json",
-      "calibration": "dssds/U3.cal",
+      "calibration": "../finestructure_fit/calout/U3.cal",
       "position": {
-        "x": "28.76 mm",
-        "y": "0.502 mm",
-        "z": "29.61 mm"
+        "x": "26.61 mm",
+        "y": "-9.42 mm",
+        "z": "26.61 mm"
       },
       "normal": {
         "x": "-1 mm",
@@ -84,9 +118,9 @@
         "z": "-1 mm"
       },
       "orientation": {
-        "x": "1 mm",
-        "y": "0 mm",
-        "z": "-1 mm"
+        "x": "0 mm",
+        "y": "-1 mm",
+        "z": "0 mm"
       },
       "frontMapping": {
         "prefix": "U3F",
@@ -97,41 +131,7 @@
       },
       "backMapping": {
         "prefix": "U3B",
-        "tdc": "-DEAD-",
-        "multiplicity": "",
-        "segment": "I",
-        "adc": "_E"
-      }
-    },
-    {
-      "name": "U4",
-      "file": "dssds/U4.json",
-      "calibration": "dssds/U4.cal",
-      "position": {
-        "x": "-29.95 mm",
-        "y": "-1.182 mm",
-        "z": "-28.60 mm"
-      },
-      "normal": {
-        "x": "1 mm",
-        "y": "0 mm",
-        "z": "1 mm"
-      },
-      "orientation": {
-        "x": "-1 mm",
-        "y": "0 mm",
-        "z": "1 mm"
-      },
-      "frontMapping": {
-        "prefix": "U4F",
         "tdc": "_T",
-        "multiplicity": "",
-        "segment": "I",
-        "adc": "_E"
-      },
-      "backMapping": {
-        "prefix": "U4B",
-        "tdc": "-DEAD-",
         "multiplicity": "",
         "segment": "I",
         "adc": "_E"

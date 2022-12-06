@@ -34,8 +34,6 @@ public:
     MyAnalysis(Target &target, TFile *output) : target(target) {
         NUM = 0;
 
-        //beamVector =
-
         t = new TTree("a", "a");
         t->Branch("mul", &mul);
         t->Branch("num", &NUM);
@@ -67,11 +65,11 @@ public:
         //t->Branch("EGPS", &EGPS);
 
         //SiCalc = defaultRangeInverter("p", "Silicon");
-        SiCalc = defaultRangeInverter("8He", "Silicon");
+        SiCalc = defaultRangeInverter("He4", "Silicon");
 
         for (auto &layer: target.getLayers()) {
             //targetCalcs.push_back(defaultRangeInverter(Ion::predefined("p"), layer.getMaterial()));
-            targetCalcs.push_back(defaultRangeInverter(Ion::predefined("8He"), layer.getMaterial()));
+            targetCalcs.push_back(defaultRangeInverter(Ion::predefined("He4"), layer.getMaterial()));
         }
     }
 

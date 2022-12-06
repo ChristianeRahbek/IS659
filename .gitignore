@@ -1,12 +1,9 @@
 .idea
 build
 cmake-*
-include/projectutil.h
 data
-calibration/calout
 *.png
 *.pdf
-setup
 *.root
 elog.txt
 runs/

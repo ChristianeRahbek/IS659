@@ -65,11 +65,11 @@ public:
         //t->Branch("EGPS", &EGPS);
 
         //SiCalc = defaultRangeInverter("p", "Silicon");
-        SiCalc = defaultRangeInverter("He4", "Silicon");
+        SiCalc = defaultRangeInverter("Na20", "Silicon");
 
         for (auto &layer: target.getLayers()) {
             //targetCalcs.push_back(defaultRangeInverter(Ion::predefined("p"), layer.getMaterial()));
-            targetCalcs.push_back(defaultRangeInverter(Ion::predefined("He4"), layer.getMaterial()));
+            targetCalcs.push_back(defaultRangeInverter(Ion::predefined("Na20"), layer.getMaterial()));
         }
     }
 

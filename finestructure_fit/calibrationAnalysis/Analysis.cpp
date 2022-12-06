@@ -65,11 +65,11 @@ public:
         //t->Branch("EGPS", &EGPS);
 
         //SiCalc = defaultRangeInverter("p", "Silicon");
-        SiCalc = defaultRangeInverter("Na20", "Silicon");
+        SiCalc = defaultRangeInverter("He4", "Silicon");
 
         for (auto &layer: target.getLayers()) {
             //targetCalcs.push_back(defaultRangeInverter(Ion::predefined("p"), layer.getMaterial()));
-            targetCalcs.push_back(defaultRangeInverter(Ion::predefined("Na20"), layer.getMaterial()));
+            targetCalcs.push_back(defaultRangeInverter(Ion::predefined("He4"), layer.getMaterial()));
         }
     }
 
@@ -143,7 +143,7 @@ public:
                 auto angle = hit.direction.Angle(-d.getNormal());
                 hit.angle = angle;
 
-                auto tF = deadlayerF[i] / abs(cos(angle));
+                auto tF = deadlayerF[i] / abs(cos(angle)); //actual thickness that the particle travels through, when it comes in at an angle.
                 auto tB = deadlayerB[i] / abs(cos(angle));
                 //auto tP = deadlayerP[i] / abs(cos(angle));
 
@@ -160,8 +160,18 @@ public:
                 hit.BE = BE;
                 hit.FE = FE;
 
-                auto &from = position;
-                for (auto &intersection: target.getIntersections(from, target.getCenter())) {
+                auto &t_c = target.getCenter();
+                auto &from = position; //coordinates of where the particle hit the detector
+
+                auto dir = (from - t_c).Unit();
+                auto t_thick = target.getThickness();
+
+                /* stop_length has the is given in mm, so it is also 0.1221 um
+                 * It is calculated at eloss.kern.phys.au.dk for E_beam = 30 keV*/
+                double stop_length = 0.1221* pow(10,-3); //how far the beam goes to be stopped
+
+                auto stop_coord = t_c - dir*(t_thick/2 - stop_length); //coordinate where the beam is stopped
+                for (auto &intersection: target.getIntersections(from, stop_coord)) {
                     auto &calc = targetCalcs[intersection.index];
                     hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed);
                 }

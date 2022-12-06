@@ -164,7 +164,8 @@ public:
                 auto &from = position; //coordinates of where the particle hit the detector
 
                 auto dir = (from - t_c).Unit();
-                auto t_thick = target.getThickness();
+                auto t_thick = target.getThickness()* pow(10,-3); //given in unit of mm.
+
 
                 /* stop_length has the is given in mm, so it is also 0.1221 um
                  * It is calculated at eloss.kern.phys.au.dk for E_beam = 30 keV*/

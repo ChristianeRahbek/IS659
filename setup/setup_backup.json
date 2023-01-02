@@ -1,0 +1,349 @@
+{
+  "name": "is659",
+  "detectors": [
+    {
+      "name": "U1",
+      "file": "dssds/U1.json",
+      "calibration": "../finestructure_fit/calout/U1.cal",
+      "position": {
+        "x": "-26.61 mm",
+        "y": "-9.42 mm",
+        "z": "-26.61 mm"
+      },
+      "normal": {
+        "x": "1 mm",
+        "y": "0 mm",
+        "z": "1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "-1 mm",
+        "z": "0 mm"
+      },
+      "frontMapping": {
+        "prefix": "U1F",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      },
+      "backMapping": {
+        "prefix": "U1B",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "U2",
+      "file": "dssds/U2.json",
+      "calibration": "../finestructure_fit/calout/U2.cal",
+      "position": {
+        "x": "-26.79 mm",
+        "y": "-9.42 mm",
+        "z": "26.79 mm"
+      },
+      "normal": {
+        "x": "1 mm",
+        "y": "0 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "-1 mm",
+        "z": "0 mm"
+      },
+      "frontMapping": {
+        "prefix": "U2F",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      },
+      "backMapping": {
+        "prefix": "U2B",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "U3",
+      "file": "dssds/U3.json",
+      "calibration": "../finestructure_fit/calout/U3.cal",
+      "position": {
+        "x": "26.61 mm",
+        "y": "-9.42 mm",
+        "z": "26.61 mm"
+      },
+      "normal": {
+        "x": "-1 mm",
+        "y": "0 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "-1 mm",
+        "z": "0 mm"
+      },
+      "frontMapping": {
+        "prefix": "U3F",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      },
+      "backMapping": {
+        "prefix": "U3B",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "U4",
+      "file": "dssds/U4.json",
+      "calibration": "../finestructure_fit/calout/U4.cal",
+      "position": {
+        "x": "26.79 mm",
+        "y": "-9.42 mm",
+        "z": "-26.79 mm"
+      },
+      "normal": {
+        "x": "-1 mm",
+        "y": "0 mm",
+        "z": "1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "-1 mm",
+        "z": "0 mm"
+      },
+      "frontMapping": {
+        "prefix": "U4F",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      },
+      "backMapping": {
+        "prefix": "U4B",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "P1",
+      "file": "plastics/P1.json",
+      "calibration": "plastics/P1.cal",
+      "position": {
+        "x": "-33.83 mm",
+        "y": "-1.182 mm",
+        "z": "-32.49 mm"
+      },
+      "normal": {
+        "x": "1 mm",
+        "y": "0 mm",
+        "z": "1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "1 mm",
+        "z": "0 mm"
+      },
+      "mapping": {
+        "tdc": "P1_T",
+        "adc": "P1_E"
+      }
+    },
+    {
+      "name": "P2",
+      "file": "plastics/P2.json",
+      "calibration": "plastics/P2.cal",
+      "position": {
+        "x": "-31.32 mm",
+        "y": "1.094 mm",
+        "z": "34.43 mm"
+      },
+      "normal": {
+        "x": "1 mm",
+        "y": "0 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "1 mm",
+        "z": "0 mm"
+      },
+      "mapping": {
+        "tdc": "P2_T",
+        "adc": "P2_E"
+      }
+    },
+    {
+      "name": "P3",
+      "file": "plastics/P3.json",
+      "calibration": "plastics/P3.cal",
+      "position": {
+        "x": "32.65 mm",
+        "y": "0.502 mm",
+        "z": "33.50 mm"
+      },
+      "normal": {
+        "x": "-1 mm",
+        "y": "0 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "1 mm",
+        "z": "0 mm"
+      },
+      "mapping": {
+        "tdc": "P3_T",
+        "adc": "P3_E"
+      }
+    },
+    {
+      "name": "P4",
+      "file": "plastics/P4.json",
+      "calibration": "plastics/P4.cal",
+      "position": {
+        "x": "32.65 mm",
+        "y": "0.502 mm",
+        "z": "33.50 mm"
+      },
+      "normal": {
+        "x": "-1 mm",
+        "y": "0 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "0 mm",
+        "y": "1 mm",
+        "z": "0 mm"
+      },
+      "mapping": {
+        "tdc": "P4_T",
+        "adc": "P4_E"
+      }
+    },
+    {
+      "name": "C1",
+      "file": "clovers/C1.json",
+      "calibration": "clovers/C1.cal",
+      "position": {
+        "x": "-57.73 mm",
+        "y": "57.73 mm",
+        "z": "57.73 mm"
+      },
+      "normal": {
+        "x": "1 mm",
+        "y": "-1 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "1 mm",
+        "y": "sqrt(2) mm",
+        "z": "-1 mm"
+      },
+      "mapping": {
+        "prefix": "C1",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "C2",
+      "file": "clovers/C2.json",
+      "calibration": "clovers/C2.cal",
+      "position": {
+        "x": "57.73 mm",
+        "y": "57.73 mm",
+        "z": "57.73 mm"
+      },
+      "normal": {
+        "x": "-1 mm",
+        "y": "-1 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "-1 mm",
+        "y": "sqrt(2) mm",
+        "z": "-1 mm"
+      },
+      "mapping": {
+        "prefix": "C2",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "C3",
+      "file": "clovers/C3.json",
+      "calibration": "clovers/C3.cal",
+      "position": {
+        "x": "-57.73 mm",
+        "y": "-57.73 mm",
+        "z": "57.73 mm"
+      },
+      "normal": {
+        "x": "1 mm",
+        "y": "1 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "-1 mm",
+        "y": "sqrt(2) mm",
+        "z": "1 mm"
+      },
+      "mapping": {
+        "prefix": "C3",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    },
+    {
+      "name": "C4",
+      "file": "clovers/C4.json",
+      "calibration": "clovers/C4.cal",
+      "position": {
+        "x": "57.73 mm",
+        "y": "-57.73 mm",
+        "z": "57.73 mm"
+      },
+      "normal": {
+        "x": "-1 mm",
+        "y": "1 mm",
+        "z": "-1 mm"
+      },
+      "orientation": {
+        "x": "1 mm",
+        "y": "sqrt(2) mm",
+        "z": "1 mm"
+      },
+      "mapping": {
+        "prefix": "C4",
+        "tdc": "_T",
+        "multiplicity": "",
+        "segment": "I",
+        "adc": "_E"
+      }
+    }
+  ],
+  "signals": [
+    "TPROTONS",
+    "TSTAMP"
+  ]
+}

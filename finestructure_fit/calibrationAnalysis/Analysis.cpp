@@ -167,18 +167,20 @@ public:
                 auto t_thick = target.getThickness(); //given in unit of mm.
 
 
-                /* stop_length has the is given in mm, so it is also 0.1221 um
+                /* stop_length has to be given in mm, so it is also 0.1221 um
                  * It is calculated at eloss.kern.phys.au.dk for E_beam = 30 keV*/
                 double stop_length = 0.1221* pow(10,-3); //how far the beam goes to be stopped
+                //double stop_length = 7*t_thick/8; //how far the beam goes to be stopped
 
                 double transversed_extra = t_thick/2 - stop_length;
-                auto stop_coord = t_c - dir*transversed_extra; //coordinate where the beam is stopped
-                for (auto &intersection: target.getIntersections(from, t_c)) {
+                //auto stop_coord = t_c + dir*transversed_extra; //coordinate where the beam is stopped
+                auto stop_coord = t_c + TVector3(0,0,transversed_extra); //coordinate where the beam is stopped
+                for (auto &intersection: target.getIntersections(from, stop_coord)) {
                     auto &calc = targetCalcs[intersection.index];
                     //cout << "new hit" << endl;
                     //cout << intersection.transversed << endl;
                     //cout << intersection.transversed + transversed_extra << endl;
-                    hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed+transversed_extra);
+                    hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed);
                 }
 
                 hit.index = i;

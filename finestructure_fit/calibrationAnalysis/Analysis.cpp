@@ -165,22 +165,35 @@ public:
                 double stop_length = 0.1221* pow(10,-3); //how far the beam goes to be stopped
                 //double stop_length = 7*t_thick/8; //how far the beam goes to be stopped
 
-                // HERFRA OG NED SKER DER NOGET UNDERLIGT I BEREGNELSEN AF TYKKELSERNE.
+                /*
+                 * Med dette kode som det er lige nu, så er upstreamdetektorerne ens og downstream detektorerne ens.
+                 * Downstream detektorerne er overkorregeret en smule, og MÅSKE er upstream detektorerne også...
+                 * */
 
                 double transversed_extra = t_thick/2 - stop_length;
-                auto stop_coord = t_c + dir*transversed_extra; //coordinate where the beam is stopped
-                //auto stop_coord = t_c - TVector3(0,0,transversed_extra); //coordinate where the beam is stopped
+                //auto stop_coord = t_c + dir*transversed_extra; //coordinate where the beam is stopped
+                auto stop_coord = t_c - TVector3(0,0,transversed_extra); //coordinate where the beam is stopped
+
+
+/*                auto &calc = targetCalcs[0];
+                if(i == 2 || i == 3){ //if downstream
+                    auto traveled = t_thick-stop_length;
+                    hit.E += calc->getTotalEnergyCorrection(hit.E, traveled/abs(cos(from.Angle(t_c))));
+                }
+                else hit.E += calc->getTotalEnergyCorrection(hit.E, stop_length/abs(cos(from.Angle(t_c))));
+*/
 
                 for (auto &intersection: target.getIntersections(from, stop_coord)) {
                     auto &calc = targetCalcs[intersection.index];
                     //hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed);
 
+/*
                     if(i == 2 || i == 3){ //if downstream
                         auto traveled = t_thick-stop_length;
                         hit.E += calc->getTotalEnergyCorrection(hit.E, traveled/abs(cos(from.Angle(t_c))));
                     }
                     else hit.E += calc->getTotalEnergyCorrection(hit.E, stop_length/abs(cos(from.Angle(t_c))));
-
+*/
                 }
 
                 hit.index = i;

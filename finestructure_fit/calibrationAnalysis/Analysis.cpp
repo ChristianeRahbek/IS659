@@ -63,11 +63,12 @@ public:
         t->Branch("TPROTONS", &TPROTONS);
 
 
-        string projectile = "Na20"; //insert type of beam here!!
-        SiCalc = defaultRangeInverter(projectile, "Silicon");
+        string product = "He4"; //insert decay product here
+        SiCalc = defaultRangeInverter(product, "Silicon"); //used to calculate energy loss in deadlayer
 
         for (auto &layer: target.getLayers()) {
-            targetCalcs.push_back(defaultRangeInverter(Ion::predefined(projectile), layer.getMaterial()));
+            //this is used to calculate energy loss in target
+            targetCalcs.push_back(defaultRangeInverter(Ion::predefined(product), layer.getMaterial()));
         }
     }
 
@@ -94,13 +95,13 @@ public:
 
 
     void findHits() {
-        for (size_t i = 0; i < output.dssdCount(); i++) {
+        for (size_t i = 0; i < output.dssdCount(); i++) { //running through detectors
             auto &o = output.getDssdOutput(i);
             auto &p = output.getSingleOutput(i);
             auto &d = o.detector();
             auto m = AUSA::mul(o);
 
-            for (UInt_t j = 0; j < m; j++) {
+            for (UInt_t j = 0; j < m; j++) { //running through every hit in each detector
                 Hit hit;
 
                 auto dE = fEnergy(o, j) - bEnergy(o, j);
@@ -127,11 +128,9 @@ public:
                 if (!simulation) {
                     hit.TF = fTime(o, j);
                     hit.TB = bTime(o, j);
-                    //hit.TPad = p.time(0);
                 } else {
                     hit.TF = 42;
                     hit.TB = 42;
-                    //hit.TPad = 42;
                 }
 
                 auto angle = hit.direction.Angle(-d.getNormal());
@@ -174,14 +173,14 @@ public:
 
                 for (auto &intersection: target.getIntersections(from, stop_coord)) {
                     auto &calc = targetCalcs[intersection.index];
-                    hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed);
-                    /*
+                    //hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed);
+
                     if(i == 2 || i == 3){ //if downstream
                         auto traveled = t_thick-stop_length;
-                        hit.E += calc->getTotalEnergyCorrection(hit.E, traveled/cos(from.Angle(t_c)));
+                        hit.E += calc->getTotalEnergyCorrection(hit.E, traveled/abs(cos(from.Angle(t_c))));
                     }
-                    else hit.E += calc->getTotalEnergyCorrection(hit.E, stop_length/cos(from.Angle(t_c)));
-                    */
+                    else hit.E += calc->getTotalEnergyCorrection(hit.E, stop_length/abs(cos(from.Angle(t_c))));
+
                 }
 
                 hit.index = i;

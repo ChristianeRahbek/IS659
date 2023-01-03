@@ -60,16 +60,14 @@ public:
         v_F = make_unique < DynamicBranchVector < short >> (*t, "FI", "mul");
         v_B = make_unique < DynamicBranchVector < short >> (*t, "BI", "mul");
 
-        //t->Branch("TPATTERN", &TPATTERN);
         t->Branch("TPROTONS", &TPROTONS);
-        //t->Branch("EGPS", &EGPS);
 
-        //SiCalc = defaultRangeInverter("p", "Silicon");
-        SiCalc = defaultRangeInverter("He4", "Silicon");
+
+        string projectile = "Na20"; //insert type of beam here!!
+        SiCalc = defaultRangeInverter(projectile, "Silicon");
 
         for (auto &layer: target.getLayers()) {
-            //targetCalcs.push_back(defaultRangeInverter(Ion::predefined("p"), layer.getMaterial()));
-            targetCalcs.push_back(defaultRangeInverter(Ion::predefined("He4"), layer.getMaterial()));
+            targetCalcs.push_back(defaultRangeInverter(Ion::predefined(projectile), layer.getMaterial()));
         }
     }
 
@@ -78,19 +76,15 @@ public:
         for (size_t i = 0; i < output.dssdCount(); ++i) {
             auto dl = getFrontDeadLayer(output.getDssdOutput(i).detector());
             auto dlB = getBackDeadLayer(output.getDssdOutput(i).detector());
-            //auto dlP = getFrontDeadLayer(output.getSingleOutput(i).detector());
             deadlayerF.push_back(dl);
             deadlayerB.push_back(dlB);
-            //deadlayerP.push_back(dlP);
         }
     }
 
 
     void analyze() override {
         clear();
-        //TPATTERN = output.getScalerOutput("TPATTERN").getValue();
         TPROTONS = output.getScalerOutput("TPROTONS").getValue();
-        //EGPS = output.getScalerOutput("EGPS").getValue();
         findHits();
         doAnalysis();
         if (mul > 0) { t->Fill(); }
@@ -175,8 +169,8 @@ public:
                 // HERFRA OG NED SKER DER NOGET UNDERLIGT I BEREGNELSEN AF TYKKELSERNE.
 
                 double transversed_extra = t_thick/2 - stop_length;
-                //auto stop_coord = t_c + dir*transversed_extra; //coordinate where the beam is stopped
-                auto stop_coord = t_c - TVector3(0,0,transversed_extra); //coordinate where the beam is stopped
+                auto stop_coord = t_c + dir*transversed_extra; //coordinate where the beam is stopped
+                //auto stop_coord = t_c - TVector3(0,0,transversed_extra); //coordinate where the beam is stopped
 
                 for (auto &intersection: target.getIntersections(from, stop_coord)) {
                     auto &calc = targetCalcs[intersection.index];

@@ -1,4 +1,4 @@
-for run in 032; do
+for run in 167; do
     SETUP="../setup/setup.json"
 
     echo "Sorting run : $run using $SETUP"

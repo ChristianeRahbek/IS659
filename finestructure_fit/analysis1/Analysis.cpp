@@ -34,57 +34,56 @@ public:
   MyAnalysis(Target &target, TFile *output) : target(target) {
     NUM = 0;
 
-    //beamVector =
-
     t = new TTree("a", "a");
     t->Branch("mul", &mul);
     t->Branch("num", &NUM);
 
-    v_dir0 = make_unique<DynamicBranchVector<TVector3>>(*t, "dir0");
-    v_pos0 = make_unique<DynamicBranchVector<TVector3>>(*t, "pos0");
-    v_dir1 = make_unique<DynamicBranchVector<TVector3>>(*t, "dir1");
-    v_pos1 = make_unique<DynamicBranchVector<TVector3>>(*t, "pos1");
+    v_dir = make_unique<DynamicBranchVector<TVector3>>(*t, "dir");
+    v_pos = make_unique<DynamicBranchVector<TVector3>>(*t, "pos");
 
-    v_theta0 = make_unique<DynamicBranchVector<double>>(*t, "theta0", "mul");
-    v_ang0 = make_unique<DynamicBranchVector<double>>(*t, "angle0", "mul");
-    v_theta1 = make_unique<DynamicBranchVector<double>>(*t, "theta1", "mul");
-    v_ang1 = make_unique<DynamicBranchVector<double>>(*t, "angle1", "mul");
+    v_theta = make_unique<DynamicBranchVector<double>>(*t, "theta", "mul");
+    v_ang = make_unique<DynamicBranchVector<double>>(*t, "angle", "mul");
 
-    v_E0 = make_unique<DynamicBranchVector<double>>(*t, "E0", "mul");
-    v_BE0 = make_unique<DynamicBranchVector<double>>(*t, "BE0", "mul");
-    v_FE0 = make_unique<DynamicBranchVector<double>>(*t, "FE0", "mul");
-    v_E1 = make_unique<DynamicBranchVector<double>>(*t, "E1", "mul");
-    v_BE1 = make_unique<DynamicBranchVector<double>>(*t, "BE1", "mul");
-    v_FE1 = make_unique<DynamicBranchVector<double>>(*t, "FE1", "mul");
+    v_Edssd = make_unique<DynamicBranchVector<double>>(*t, "Edssd", "mul");
+    v_Ea = make_unique<DynamicBranchVector<double>>(*t, "Ea", "mul");
+    v_BE = make_unique<DynamicBranchVector<double>>(*t, "BE", "mul");
+    v_FE = make_unique<DynamicBranchVector<double>>(*t, "FE", "mul");
+    v_Et = make_unique<DynamicBranchVector<double>>(*t, "Et", "mul");
 
-    v_FT0 = make_unique<DynamicBranchVector<double>>(*t, "FT0", "mul");
-    v_BT0 = make_unique<DynamicBranchVector<double>>(*t, "BT0", "mul");
-    v_FT1 = make_unique<DynamicBranchVector<double>>(*t, "FT1", "mul");
-    v_BT1 = make_unique<DynamicBranchVector<double>>(*t, "BT1", "mul");
+    v_Edep0 = make_unique<DynamicBranchVector<double>>(*t, "Edep0", "mul");
+    v_Edep1 = make_unique<DynamicBranchVector<double>>(*t, "Edep1", "mul");
+    v_Edep2 = make_unique<DynamicBranchVector<double>>(*t, "Edep2", "mul");
+    v_Edep3 = make_unique<DynamicBranchVector<double>>(*t, "Edep3", "mul");
 
-    v_dE0 = make_unique<DynamicBranchVector<double>>(*t, "dE0", "mul");
-    v_Ecm0 = make_unique<DynamicBranchVector<double>>(*t, "E0cm", "mul");
-    v_dE1 = make_unique<DynamicBranchVector<double>>(*t, "dE1", "mul");
-    v_Ecm1 = make_unique<DynamicBranchVector<double>>(*t, "E1cm", "mul");
+    v_Ea0 = make_unique<DynamicBranchVector<double>>(*t, "Ea0", "mul");
+    v_Ea1 = make_unique<DynamicBranchVector<double>>(*t, "Ea1", "mul");
+    v_Ea2 = make_unique<DynamicBranchVector<double>>(*t, "Ea2", "mul");
+    v_Ea3 = make_unique<DynamicBranchVector<double>>(*t, "Ea3", "mul");
 
-    v_i0 = make_unique<DynamicBranchVector<short>>(*t, "id0", "mul");
-    v_i1 = make_unique<DynamicBranchVector<short>>(*t, "id1", "mul");
+    v_Et0 = make_unique<DynamicBranchVector<double>>(*t, "Et0", "mul");
+    v_Et1 = make_unique<DynamicBranchVector<double>>(*t, "Et1", "mul");
+    v_Et2 = make_unique<DynamicBranchVector<double>>(*t, "Et2", "mul");
+    v_Et3 = make_unique<DynamicBranchVector<double>>(*t, "Et3", "mul");
 
-    v_F0 = make_unique<DynamicBranchVector<short>>(*t, "FI0", "mul");
-    v_B0 = make_unique<DynamicBranchVector<short>>(*t, "BI0", "mul");
-    v_F1 = make_unique<DynamicBranchVector<short>>(*t, "FI1", "mul");
-    v_B1 = make_unique<DynamicBranchVector<short>>(*t, "BI1", "mul");
+    v_FT = make_unique<DynamicBranchVector<double>>(*t, "FT", "mul");
+    v_BT = make_unique<DynamicBranchVector<double>>(*t, "BT", "mul");
 
-    //t->Branch("TPATTERN", &TPATTERN);
+    v_dE = make_unique<DynamicBranchVector<double>>(*t, "dE", "mul");
+    v_Ecm = make_unique<DynamicBranchVector<double>>(*t, "Ecm", "mul");
+
+    v_i = make_unique<DynamicBranchVector<short>>(*t, "id", "mul");
+
+    v_F = make_unique<DynamicBranchVector<short>>(*t, "FI", "mul");
+    v_B = make_unique<DynamicBranchVector<short>>(*t, "BI", "mul");
+
     t->Branch("TPROTONS", &TPROTONS);
-    //t->Branch("EGPS", &EGPS);
 
-    //SiCalc = defaultRangeInverter("p", "Silicon");
-    SiCalc = defaultRangeInverter("8He", "Silicon");
+    aSiCalc = defaultRangeInverter("a", "Silicon"); //for alphas through deadlayer
+    tSiCalc = defaultRangeInverter("t", "Silicon"); //for tritons through deadlayer
 
     for (auto &layer: target.getLayers()) {
-      //targetCalcs.push_back(defaultRangeInverter(Ion::predefined("p"), layer.getMaterial()));
-        targetCalcs.push_back(defaultRangeInverter(Ion::predefined("8He"), layer.getMaterial()));
+        aTargetCalcs.push_back(defaultRangeInverter(Ion::predefined("a"), layer.getMaterial())); //for alphas through target
+        tTargetCalcs.push_back(defaultRangeInverter(Ion::predefined("t"), layer.getMaterial())); //for tritons through target
     }
   }
 
@@ -93,22 +92,18 @@ public:
     for (size_t i = 0; i < output.dssdCount(); ++i) {
       auto dl = getFrontDeadLayer(output.getDssdOutput(i).detector());
       auto dlB = getBackDeadLayer(output.getDssdOutput(i).detector());
-      //auto dlP = getFrontDeadLayer(output.getSingleOutput(i).detector());
       deadlayerF.push_back(dl);
       deadlayerB.push_back(dlB);
-      //deadlayerP.push_back(dlP);
     }
   }
 
 
   void analyze() override {
     clear();
-    //TPATTERN = output.getScalerOutput("TPATTERN").getValue();
     TPROTONS = output.getScalerOutput("TPROTONS").getValue();
-    //EGPS = output.getScalerOutput("EGPS").getValue();
     findHits();
     doAnalysis();
-    if (mul > 0) { t->Fill(); }
+    if (mul > 1) { t->Fill(); } //looking for coincidences
     hits.clear();
     NUM++;
   }
@@ -145,6 +140,7 @@ public:
         hit.direction = direction;
         hit.theta = hit.direction.Theta();
 
+
         if (!simulation) {
           hit.TF = fTime(o, j);
           hit.TB = bTime(o, j);
@@ -162,28 +158,56 @@ public:
         auto tB = deadlayerB[i] / abs(cos(angle));
         //auto tP = deadlayerP[i] / abs(cos(angle));
 
-        double E = 0.0;
+        double Ea = 0.0;
+        double Et = 0.0;
         double FE = 0.0;
         double BE = 0.0;
 
-        E += eDssd;
-        E += SiCalc->getTotalEnergyCorrection(E, tF);
-        FE += eFDssd; //only energy correction on E.
+        Ea += eDssd;
+        Ea += aSiCalc->getTotalEnergyCorrection(Ea, tF);
+        Et += eDssd;
+        Et += tSiCalc->getTotalEnergyCorrection(Et, tF);
+
+        FE += eFDssd; //only energy correction on Ea and Et.
         BE += eBDssd;
 
-        hit.E = E;
+        auto &from = position;
+        for (auto &intersection: target.getIntersections(from, target.getCenter() /*NOT IN CENTER!*/)) {
+            auto &calca = aTargetCalcs[intersection.index];
+            auto &calct = tTargetCalcs[intersection.index];
+            Ea += calca->getTotalEnergyCorrection(Ea, intersection.transversed);
+            Et += calct->getTotalEnergyCorrection(Et, intersection.transversed);
+        }
+
+        hit.Ea = Ea;
+        hit.Et = Et;
+        hit.Edssd = eDssd; //deposited energy in detector
         hit.BE = BE;
         hit.FE = FE;
 
-
-        auto &from = position;
-        for (auto &intersection: target.getIntersections(from, target.getCenter())) {
-          auto &calc = targetCalcs[intersection.index];
-          hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed);
+        //Saving energies from different detectors
+        if(i == 0) {
+            hit.Edep0 = eDssd;
+            hit.Ea0 = Ea;
+            hit.Et0 = Et;
+        }
+        else if (i == 1){
+            hit.Edep1 = eDssd;
+            hit.Ea1 = Ea;
+            hit.Et1 = Et;
+        }
+        else if (i == 2){
+            hit.Edep2 = eDssd;
+            hit.Ea2 = Ea;
+            hit.Et2 = Et;
+        }
+        else if (i == 3){
+            hit.Edep3 = eDssd;
+            hit.Ea3 = Ea;
+            hit.Et3 = Et;
         }
 
         hit.index = i;
-        hit.lVector = {sqrt(2 * hit.E * ALPHA_MASS) * hit.direction, hit.E + ALPHA_MASS};
         hits.emplace_back(move(hit));
       }
     }
@@ -191,26 +215,43 @@ public:
 
   void doAnalysis() {
     if (hits.empty()) return;
-    mul = hits.size(); //mul0, mul1 or mul??? It started as mul.
+    mul = hits.size();
 
     for(auto &hit: hits) {
-        v_pos0->add(hit.position);
-        v_dir0->add(hit.direction);
-        v_theta0->add(hit.theta * TMath::RadToDeg());
+        v_pos->add(hit.position);
+        v_dir->add(hit.direction);
+        v_theta->add(hit.theta * TMath::RadToDeg());
 
-        v_E0->add(hit.E);
-        v_BE0->add(hit.BE);
-        v_FE0->add(hit.FE);
+        v_Ea->add(hit.Ea);
+        v_Et->add(hit.Et);
+        v_Edssd -> add(hit.Edssd);
+        v_BE->add(hit.BE);
+        v_FE->add(hit.FE);
 
-        v_dE0->add(hit.dE);
-            //v_E0cm->add(E0cm);
-        v_ang0->add(hit.angle * TMath::RadToDeg());
+        v_Edep0 -> add(hit.Edep0);
+        v_Edep1 -> add(hit.Edep1);
+        v_Edep2 -> add(hit.Edep2);
+        v_Edep3 -> add(hit.Edep3);
 
-        v_i0->add(static_cast<short>(hit.index));
-        v_F0->add(hit.fseg);
-        v_B0->add(hit.bseg);
-        v_FT0->add(hit.TF);
-        v_BT0->add(hit.TB);
+        v_Ea0 -> add(hit.Ea0);
+        v_Ea1 -> add(hit.Ea1);
+        v_Ea2 -> add(hit.Ea2);
+        v_Ea3 -> add(hit.Ea3);
+
+        v_Et0 -> add(hit.Ea0);
+        v_Et1 -> add(hit.Ea1);
+        v_Et2 -> add(hit.Ea2);
+        v_Et3 -> add(hit.Ea3);
+
+        v_dE->add(hit.dE);
+            //v_Ecm->add(Ecm);
+        v_ang->add(hit.angle * TMath::RadToDeg());
+
+        v_i->add(static_cast<short>(hit.index));
+        v_F->add(hit.fseg);
+        v_B->add(hit.bseg);
+        v_FT->add(hit.TF);
+        v_BT->add(hit.TB);
     }
   }
 
@@ -222,29 +263,33 @@ public:
   void clear() {
     mul = 0;
     AUSA::clear(
-        *v_E1, *v_theta1, *v_E0, *v_theta0,
-        *v_i1, *v_FE1, *v_BE1, *v_i0, *v_FE0, *v_BE0,
-        *v_F1, *v_B1, *v_Ecm1, *v_F0, *v_B0, *v_Ecm0,
-        *v_ang1, *v_pos1, *v_dir1, *v_ang0, *v_pos0, *v_dir0,
-        *v_dE1, *v_FT1, *v_BT1, *v_dE0, *v_FT0, *v_BT0
+        *v_Et, *v_Ea, *v_theta, *v_Edssd,
+        *v_Edep0, *v_Edep1, *v_Edep2, *v_Edep3,
+        *v_Ea0, *v_Ea1, *v_Ea2, *v_Ea3,
+        *v_Et0, *v_Et1, *v_Et2, *v_Et3,
+        *v_i, *v_FE, *v_BE,
+        *v_F, *v_B, *v_Ecm,
+        *v_ang, *v_pos, *v_dir,
+        *v_dE, *v_FT, *v_BT
     );
   }
 
   int NUM;
   TTree *t;
-  unique_ptr<DynamicBranchVector<TVector3>> v_dir1, v_pos1, v_dir0, v_pos0;
-  unique_ptr<DynamicBranchVector<double>> v_E0, v_BE0, v_FE0, v_theta0, v_dE0, v_Ecm0;
-  unique_ptr<DynamicBranchVector<double>> v_E1, v_BE1, v_FE1, v_theta1, v_dE1, v_Ecm1;
-  unique_ptr<DynamicBranchVector<short>> v_i1, v_i0;
-  unique_ptr<DynamicBranchVector<short>> v_F1, v_B1, v_F0, v_B0;
-  unique_ptr<DynamicBranchVector<double>> v_ang1, v_ang0;
-  unique_ptr<DynamicBranchVector<double>> v_FT1, v_BT1, v_FT0, v_BT0;
+  unique_ptr<DynamicBranchVector<TVector3>> v_dir, v_pos;
+  unique_ptr<DynamicBranchVector<double>> v_Edssd, v_Edep0, v_Edep1, v_Edep2, v_Edep3;
+  unique_ptr<DynamicBranchVector<double>> v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;
+  unique_ptr<DynamicBranchVector<double>> v_Ea0, v_Ea1, v_Ea2, v_Ea3, v_Et0, v_Et1, v_Et2, v_Et3;
+  unique_ptr<DynamicBranchVector<short>> v_i;
+  unique_ptr<DynamicBranchVector<short>> v_F, v_B;
+  unique_ptr<DynamicBranchVector<double>> v_ang;
+  unique_ptr<DynamicBranchVector<double>> v_FT, v_BT;
 
-  UInt_t mul{}, TPROTONS{}; //TPATTERN{}, EGPS{};
+  UInt_t mul{}, TPROTONS{};
   vector<Hit> hits;
 
-  unique_ptr<EnergyLossRangeInverter> SiCalc;
-  vector<unique_ptr<EnergyLossRangeInverter>> targetCalcs;
+  unique_ptr<EnergyLossRangeInverter> aSiCalc, tSiCalc;
+  vector<unique_ptr<EnergyLossRangeInverter>> aTargetCalcs, tTargetCalcs;
   vector<double> deadlayerF, deadlayerB, deadlayerP;
   Target &target;
   bool simulation = false;

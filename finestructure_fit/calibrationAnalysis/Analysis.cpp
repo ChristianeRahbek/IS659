@@ -171,8 +171,8 @@ public:
                  * */
 
                 double transversed_extra = t_thick/2 - stop_length;
-                //auto stop_coord = t_c + dir*transversed_extra; //coordinate where the beam is stopped
-                auto stop_coord = t_c - TVector3(0,0,transversed_extra); //coordinate where the beam is stopped
+                auto stop_coord = t_c + direction*transversed_extra; //coordinate where the beam is stopped
+                //auto stop_coord = t_c - TVector3(0,0,transversed_extra); //coordinate where the beam is stopped
 
 
 /*                auto &calc = targetCalcs[0];

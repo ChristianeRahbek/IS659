@@ -6,7 +6,10 @@ struct Hit {
     double deposited;
     double paddeposited;
 
-    double E, FE, BE, Edssd, dE, EBeta, fbdiff, Ecm;
+    double Ea, Et, FE, BE, Edssd, dE,
+           EBeta, fbdiff, Ecm,
+           Edep0, Edep1, Edep2, Edep3, /*Deposited energy in each detector*/
+           Ea0, Ea1, Ea2, Ea3, Et0, Et1, Et2, Et3; //alpha and triton energies in each detector
 
 
     double TF, TB, TPad, T;

@@ -50,10 +50,10 @@ public:
     v_theta1 = make_unique<DynamicBranchVector<double>>(*t, "theta1", "mul");
     v_ang1 = make_unique<DynamicBranchVector<double>>(*t, "angle1", "mul");
 
-    v_E0 = make_unique<DynamicBranchVector<double>>(*t, "E0", "mul");
-    v_BE0 = make_unique<DynamicBranchVector<double>>(*t, "BE0", "mul");
-    v_FE0 = make_unique<DynamicBranchVector<double>>(*t, "FE0", "mul");
-    v_E1 = make_unique<DynamicBranchVector<double>>(*t, "E1", "mul");
+    v_Ea = make_unique<DynamicBranchVector<double>>(*t, "E0", "mul");
+    v_BE = make_unique<DynamicBranchVector<double>>(*t, "BE0", "mul");
+    v_FE = make_unique<DynamicBranchVector<double>>(*t, "FE0", "mul");
+    v_Et = make_unique<DynamicBranchVector<double>>(*t, "E1", "mul");
     v_BE1 = make_unique<DynamicBranchVector<double>>(*t, "BE1", "mul");
     v_FE1 = make_unique<DynamicBranchVector<double>>(*t, "FE1", "mul");
 
@@ -215,10 +215,10 @@ public:
             v_dir1->add(h1.direction);
             v_theta1->add(h1.theta * TMath::RadToDeg());
 
-            v_E0->add(h0.E);
-            v_BE0->add(h0.BE);
-            v_FE0->add(h0.FE);
-            v_E1->add(h1.E);
+            v_Ea->add(h0.E);
+            v_BE->add(h0.BE);
+            v_FE->add(h0.FE);
+            v_Et->add(h1.E);
             v_BE1->add(h1.BE);
             v_FE1->add(h1.FE);
 
@@ -251,8 +251,8 @@ public:
   void clear() {
     mul = 0;
     AUSA::clear(
-        *v_E1, *v_theta1, *v_E0, *v_theta0,
-        *v_i1, *v_FE1, *v_BE1, *v_i0, *v_FE0, *v_BE0,
+        *v_Et, *v_theta1, *v_Ea, *v_theta0,
+        *v_i1, *v_FE1, *v_BE1, *v_i0, *v_FE, *v_BE,
         *v_F1, *v_B1, *v_Ecm1, *v_F0, *v_B0, *v_Ecm0,
         *v_ang1, *v_pos1, *v_dir1, *v_ang0, *v_pos0, *v_dir0,
         *v_dE1, *v_FT1, *v_BT1, *v_dE0, *v_FT0, *v_BT0
@@ -262,8 +262,8 @@ public:
   int NUM;
   TTree *t;
   unique_ptr<DynamicBranchVector<TVector3>> v_dir1, v_pos1, v_dir0, v_pos0;
-  unique_ptr<DynamicBranchVector<double>> v_E0, v_BE0, v_FE0, v_theta0, v_dE0, v_Ecm0;
-  unique_ptr<DynamicBranchVector<double>> v_E1, v_BE1, v_FE1, v_theta1, v_dE1, v_Ecm1;
+  unique_ptr<DynamicBranchVector<double>> v_Ea, v_BE, v_FE, v_theta0, v_dE0, v_Ecm0;
+  unique_ptr<DynamicBranchVector<double>> v_Et, v_BE1, v_FE1, v_theta1, v_dE1, v_Ecm1;
   unique_ptr<DynamicBranchVector<short>> v_i1, v_i0;
   unique_ptr<DynamicBranchVector<short>> v_F1, v_B1, v_F0, v_B0;
   unique_ptr<DynamicBranchVector<double>> v_ang1, v_ang0;

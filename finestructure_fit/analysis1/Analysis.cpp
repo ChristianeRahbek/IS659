@@ -50,6 +50,8 @@ public:
     v_FE = make_unique<DynamicBranchVector<double>>(*t, "FE", "mul");
     v_Et = make_unique<DynamicBranchVector<double>>(*t, "Et", "mul");
 
+    v_Edep_alphas = make_unique<DynamicBranchVector<double>>(*t, "Edep_alphas", "mul");
+
     v_Edep0 = make_unique<DynamicBranchVector<double>>(*t, "Edep0", "mul");
     v_Edep1 = make_unique<DynamicBranchVector<double>>(*t, "Edep1", "mul");
     v_Edep2 = make_unique<DynamicBranchVector<double>>(*t, "Edep2", "mul");
@@ -163,6 +165,7 @@ public:
         double FE = 0.0;
         double BE = 0.0;
 
+        /* Energy corrections in deadlayer */
         Ea += eDssd;
         Ea += aSiCalc->getTotalEnergyCorrection(Ea, tF);
         Et += eDssd;
@@ -171,12 +174,27 @@ public:
         FE += eFDssd; //only energy correction on Ea and Et.
         BE += eBDssd;
 
+
+        /* stop_length has to be given in mm, so it is also 0.1221 um
+         * It is calculated at eloss.kern.phys.au.dk for E_beam = 30 keV*/
+        double stop_length = 0.2868* pow(10,-3); //how far the beam goes to be stopped
+
+
+
+        /* Energy corrections in target */
         auto &from = position;
         for (auto &intersection: target.getIntersections(from, target.getCenter() /*NOT IN CENTER!*/)) {
             auto &calca = aTargetCalcs[intersection.index];
             auto &calct = tTargetCalcs[intersection.index];
-            Ea += calca->getTotalEnergyCorrection(Ea, intersection.transversed);
-            Et += calct->getTotalEnergyCorrection(Et, intersection.transversed);
+            auto traveled = target.getThickness() - stop_length;
+            if(i == 2 || i == 3) {
+                Ea += calca->getTotalEnergyCorrection(Ea, traveled/abs(cos(from.Angle(target.getCenter()))));
+                Et += calct->getTotalEnergyCorrection(Et, traveled/abs(cos(from.Angle(target.getCenter()))));
+            }
+            else {
+                Ea += calca->getTotalEnergyCorrection(Ea, stop_length/abs(cos(from.Angle(target.getCenter()))));
+                Et += calct->getTotalEnergyCorrection(Et, stop_length/abs(cos(from.Angle(target.getCenter()))));
+            }
         }
 
         hit.Ea = Ea;
@@ -207,6 +225,9 @@ public:
             hit.Et3 = Et;
         }
 
+        //finding only
+
+
         hit.index = i;
         hits.emplace_back(move(hit));
       }
@@ -232,6 +253,8 @@ public:
         v_Edep1 -> add(hit.Edep1);
         v_Edep2 -> add(hit.Edep2);
         v_Edep3 -> add(hit.Edep3);
+
+        v_Edep_alphas -> add(hit.Edep_alphas);
 
         v_Ea0 -> add(hit.Ea0);
         v_Ea1 -> add(hit.Ea1);
@@ -270,14 +293,14 @@ public:
         *v_i, *v_FE, *v_BE,
         *v_F, *v_B, *v_Ecm,
         *v_ang, *v_pos, *v_dir,
-        *v_dE, *v_FT, *v_BT
+        *v_dE, *v_FT, *v_BT, *v_Edep_alphas
     );
   }
 
   int NUM;
   TTree *t;
   unique_ptr<DynamicBranchVector<TVector3>> v_dir, v_pos;
-  unique_ptr<DynamicBranchVector<double>> v_Edssd, v_Edep0, v_Edep1, v_Edep2, v_Edep3;
+  unique_ptr<DynamicBranchVector<double>> v_Edssd, v_Edep0, v_Edep1, v_Edep2, v_Edep3, v_Edep_alphas;
   unique_ptr<DynamicBranchVector<double>> v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;
   unique_ptr<DynamicBranchVector<double>> v_Ea0, v_Ea1, v_Ea2, v_Ea3, v_Et0, v_Et1, v_Et2, v_Et3;
   unique_ptr<DynamicBranchVector<short>> v_i;
@@ -301,10 +324,10 @@ void prepareFileIO(const string &configfile) {
   cfg.readFile(configfile.c_str());
 
   if (cfg.lookup("paths_relative_to_project_root")) {
-    setup_path = ANALYSIS::getProjectRoot() + "/" + cfg.lookup("setup_file").c_str();
-    target_path = ANALYSIS::getProjectRoot() + "/" + cfg.lookup("target_file").c_str();
-    input_path = ANALYSIS::getProjectRoot() + "/" + cfg.lookup("data_input").c_str();
-    output_dir = ANALYSIS::getProjectRoot() + "/" + cfg.lookup("data_output_dir").c_str();
+    setup_path = EUtil::getProjectRoot() + "/" + cfg.lookup("setup_file").c_str();
+    target_path = EUtil::getProjectRoot() + "/" + cfg.lookup("target_file").c_str();
+    input_path = EUtil::getProjectRoot() + "/" + cfg.lookup("data_input").c_str();
+    output_dir = EUtil::getProjectRoot() + "/" + cfg.lookup("data_output_dir").c_str();
   } else {
     setup_path = cfg.lookup("setup_file").c_str();
     target_path = cfg.lookup("target_file").c_str();
@@ -324,7 +347,7 @@ void prepareFileIO(const string &configfile) {
 
 
 int main(int argc, char *argv[]) {
-  prepareFileIO(ANALYSIS::getProjectRoot() + "/Analysis.cfg");
+  prepareFileIO(EUtil::getProjectRoot() + "/Analysis.cfg");
   auto setup = JSON::readSetupFromJSON(setup_path);
   auto target = JSON::readTargetFromJSON(target_path);
 
@@ -345,7 +368,7 @@ int main(int argc, char *argv[]) {
     reader.add(in);
     reader.setVerbose(true);
 
-    string stem = ANALYSIS::getStem(in);
+    string stem = EUtil::getStem(in);
     TString outfile = (output_dir + "/" + stem + "lio.root").c_str();
 
     cout << "Reading from: " << in << endl;

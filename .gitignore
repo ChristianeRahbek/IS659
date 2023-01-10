@@ -8,3 +8,6 @@ data
 elog.txt
 runs/
 cmake
+*.ps
+*.dat
+finestructre_fit/analysis1/output/bat/167batEdssd.dat

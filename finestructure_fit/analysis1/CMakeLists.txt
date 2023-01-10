@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(analysis1)
 
-#set(CMAKE_CXX_STANDARD 14)
-
-#add_executable(analysis1 Analysis.cpp)
-
-#From Erik's file
-
 find_package(AUSALIB REQUIRED)
 find_package(libconfig++ QUIET)
 if(NOT libconfig++_FOUND)
@@ -27,6 +21,7 @@ FetchContent_MakeAvailable(eutil)
 
 add_executable(analysis1 Analysis.cpp)
 add_executable(bat_split bat_split.cpp)
+add_executable(hstack hstack.cpp)
 #target_link_libraries(analysis1 PRIVATE AUSA::AUSA config++)
 #target_include_directories(analysis1 PRIVATE ${CMAKE_SOURCE_DIR}/include)
 #target_link_libraries(bat_split PRIVATE AUSA::AUSA config++)

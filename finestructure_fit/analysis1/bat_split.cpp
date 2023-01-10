@@ -1,6 +1,7 @@
 //
-// Created by erik on 6/10/22.
+// Originally created by erik on 6/10/22.
 // Split branches shared between all detectors from output of bat.cpp into separate detector branches.
+// Modified by Christiane on 09/01/23
 //
 
 #include <TChain.h>

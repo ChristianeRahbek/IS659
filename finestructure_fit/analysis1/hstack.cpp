@@ -9,9 +9,14 @@
 #include "TTree.h"
 #include "TLegend.h"
 
-void hstack() {
+void hstack(bool bat) {
     //defining each histogram
-    auto *f= new TFile("/mnt/d/IS659/finestructure_fit/analysis1/output/Run167mlio.root");
+    //bool bat = false;
+    std::string addition;
+    if(bat) addition = "bat/";
+    else addition = "";
+
+    auto *f= new TFile(("/mnt/d/IS659/finestructure_fit/analysis1/output/" + addition + "Run167mlio.root").c_str());
     auto *tr=(TTree*)f->Get("a");
 
     auto h1st = new TH1F("h1st", "h1st", 1000, 200 , 8000);
@@ -53,7 +58,7 @@ void hstack() {
     hs->Draw("nostack");
     l->Draw();
 
-    hs->SaveAs("/mnt/d/IS659/finestructure_fit/analysis1/output/Energies.png");
+    hs->SaveAs(("/mnt/d/IS659/finestructure_fit/analysis1/output/" + addition + "Energies.png").c_str());
 
     TCanvas *cst = new TCanvas("cst","stacked hists",10,10,700,700);
 
@@ -79,7 +84,7 @@ void hstack() {
 
     l1->Draw();
 
-    hs1->SaveAs("/mnt/d/IS659/finestructure_fit/analysis1/output/CumEdep.png");
+    hs1->SaveAs(("/mnt/d/IS659/finestructure_fit/analysis1/output/" + addition + "CumEdep.png").c_str());
 
 }
 

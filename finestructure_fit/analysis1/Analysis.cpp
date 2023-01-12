@@ -57,6 +57,7 @@ public:
     v_Edep2 = make_unique<DynamicBranchVector<double>>(*t, "Edep2", "mul");
     v_Edep3 = make_unique<DynamicBranchVector<double>>(*t, "Edep3", "mul");
 
+    /*
     v_Ea0 = make_unique<DynamicBranchVector<double>>(*t, "Ea0", "mul");
     v_Ea1 = make_unique<DynamicBranchVector<double>>(*t, "Ea1", "mul");
     v_Ea2 = make_unique<DynamicBranchVector<double>>(*t, "Ea2", "mul");
@@ -66,6 +67,7 @@ public:
     v_Et1 = make_unique<DynamicBranchVector<double>>(*t, "Et1", "mul");
     v_Et2 = make_unique<DynamicBranchVector<double>>(*t, "Et2", "mul");
     v_Et3 = make_unique<DynamicBranchVector<double>>(*t, "Et3", "mul");
+    */
 
     v_FT = make_unique<DynamicBranchVector<double>>(*t, "FT", "mul");
     v_BT = make_unique<DynamicBranchVector<double>>(*t, "BT", "mul");
@@ -105,7 +107,7 @@ public:
     TPROTONS = output.getScalerOutput("TPROTONS").getValue();
     findHits();
     doAnalysis();
-    if (mul > 1) { t->Fill(); } //looking for coincidences
+    if (mul > 0) { t->Fill(); } //looking for coincidences
     hits.clear();
     NUM++;
   }
@@ -236,7 +238,7 @@ public:
 
   void doAnalysis() {
     if (hits.empty()) return;
-    mul = hits.size();
+    //mul = hits.size();
 
     for(auto &hit: hits) {
         v_pos->add(hit.position);
@@ -275,6 +277,8 @@ public:
         v_B->add(hit.bseg);
         v_FT->add(hit.TF);
         v_BT->add(hit.TB);
+
+        mul++;
     }
   }
 

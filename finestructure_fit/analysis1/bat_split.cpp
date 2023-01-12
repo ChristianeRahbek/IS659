@@ -49,7 +49,8 @@ void bat(int run_num) {
   auto Edep2 = make_unique<DynamicBranchVector<double>>(*tree, "Edep2", "mul");
   auto Edep3 = make_unique<DynamicBranchVector<double>>(*tree, "Edep3", "mul");
 
-  for (UInt_t i = 0; i < c->GetEntries(); i++) {
+  for (UInt_t i = 0; i < 100; i++) {
+  //for (UInt_t i = 0; i < c->GetEntries(); i++) {
     AUSA::clear(*idout, *Edssd,*Edep0, *Edep1, *Edep2, *Edep3);
     c->GetEntry(i);
 

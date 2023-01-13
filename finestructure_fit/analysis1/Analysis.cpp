@@ -57,7 +57,7 @@ public:
     v_Edep2 = make_unique<DynamicBranchVector<double>>(*t, "Edep2", "mul");
     v_Edep3 = make_unique<DynamicBranchVector<double>>(*t, "Edep3", "mul");
 
-    /*
+
     v_Ea0 = make_unique<DynamicBranchVector<double>>(*t, "Ea0", "mul");
     v_Ea1 = make_unique<DynamicBranchVector<double>>(*t, "Ea1", "mul");
     v_Ea2 = make_unique<DynamicBranchVector<double>>(*t, "Ea2", "mul");
@@ -67,7 +67,7 @@ public:
     v_Et1 = make_unique<DynamicBranchVector<double>>(*t, "Et1", "mul");
     v_Et2 = make_unique<DynamicBranchVector<double>>(*t, "Et2", "mul");
     v_Et3 = make_unique<DynamicBranchVector<double>>(*t, "Et3", "mul");
-    */
+
 
     v_FT = make_unique<DynamicBranchVector<double>>(*t, "FT", "mul");
     v_BT = make_unique<DynamicBranchVector<double>>(*t, "BT", "mul");
@@ -208,21 +208,33 @@ public:
         //Saving energies from different detectors
         if(i == 0) {
             hit.Edep0 = eDssd;
+            hit.Edep1 = 0;
+            hit.Edep2 = 0;
+            hit.Edep3 = 0;
             hit.Ea0 = Ea;
             hit.Et0 = Et;
         }
         else if (i == 1){
             hit.Edep1 = eDssd;
+            hit.Edep0 = 0;
+            hit.Edep2 = 0;
+            hit.Edep3 = 0;
             hit.Ea1 = Ea;
             hit.Et1 = Et;
         }
         else if (i == 2){
             hit.Edep2 = eDssd;
+            hit.Edep0 = 0;
+            hit.Edep1 = 0;
+            hit.Edep3 = 0;
             hit.Ea2 = Ea;
             hit.Et2 = Et;
         }
         else if (i == 3){
             hit.Edep3 = eDssd;
+            hit.Edep0 = 0;
+            hit.Edep1 = 0;
+            hit.Edep2 = 0;
             hit.Ea3 = Ea;
             hit.Et3 = Et;
         }

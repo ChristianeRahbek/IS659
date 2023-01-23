@@ -42,23 +42,25 @@ void bat(int run_num) {
   tree->Branch("num", &num);
   tree->Branch("mul", &mul);
   tree->Branch("TPROTONS", &TPROTONS);
-  auto idout = make_unique<DynamicBranchVector<unsigned short>>(*tree, "id", "mul");
-  auto Edssd = make_unique<DynamicBranchVector<double>>(*tree, "Edssd", "mul");
+  //auto idout = make_unique<DynamicBranchVector<unsigned short>>(*tree, "id", "mul");
   auto Edep0 = make_unique<DynamicBranchVector<double>>(*tree, "Edep0", "mul");
   auto Edep1 = make_unique<DynamicBranchVector<double>>(*tree, "Edep1", "mul");
   auto Edep2 = make_unique<DynamicBranchVector<double>>(*tree, "Edep2", "mul");
   auto Edep3 = make_unique<DynamicBranchVector<double>>(*tree, "Edep3", "mul");
 
-  for (UInt_t i = 0; i < 100; i++) {
-  //for (UInt_t i = 0; i < c->GetEntries(); i++) {
-    AUSA::clear(*idout, *Edssd,*Edep0, *Edep1, *Edep2, *Edep3);
+  //for (UInt_t i = 0; i < 100; i++) {
+  for (UInt_t i = 0; i < c->GetEntries(); i++) {
+    //AUSA::clear(*idout, *Edssd,*Edep0, *Edep1, *Edep2, *Edep3);
+      AUSA::clear(*Edep0, *Edep1, *Edep2, *Edep3);
     c->GetEntry(i);
 
     for (UInt_t j = 0; j < mul; j++) {
-      idout->add(id[j]);
-      Edssd->add(Edep[j]);
+      //idout->add(id[j]);
       if (id[j] == 0) {
         Edep0->add(Edep[j]);
+        if (!(j < mul - 1)) {
+
+        }
       } else if (id[j] == 1) {
         Edep1->add(Edep[j]);
       } else if (id[j] == 2) {

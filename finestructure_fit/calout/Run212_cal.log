@@ -3,7 +3,7 @@
 # Calibrator arguments: Calibrator -s ../setup/setup.json -k ../setup/calibration/4a.json -r 2 -b 13 -d U4 --eloss --gui
 # Input files: 
 #	../runs/Run212.root
-Current time is: 2022-11-11 11:20
+Current time is: 2023-01-17 11:53
 ======================================================
 
 Starting calibration of U4
@@ -423,32 +423,26 @@ Deadlayer corrected source
 	{(5370.96, 0.0166734), (5425.87, 0.131579), (5468.71, 0.851748)}
 	{(5746.29, 0.231), (5788.49, 0.769)}
 Peaks:
-	Energy: 3159.56  Channel: 5423  Uncertaincy: 0.731008
-	Energy: 5087.91  Channel: 5097.68  Uncertaincy: 1.6778
-	Energy: 5126.78  Channel: 5091.01  Uncertaincy: 1.6778
-	Energy: 5139.1  Channel: 5088.9  Uncertaincy: 1.6778
-	Energy: 5370.96  Channel: 5375.48  Uncertaincy: 2.90806
-	Energy: 5425.87  Channel: 5366.07  Uncertaincy: 2.90806
-	Energy: 5468.71  Channel: 5358.72  Uncertaincy: 2.90806
-	Energy: 5746.29  Channel: 5098.4  Uncertaincy: 1.7252
-	Energy: 5788.49  Channel: 5091.16  Uncertaincy: 1.7252
+	Energy: 3159.56  Channel: 3095.44  Uncertaincy: 0.393793
+	Energy: 5087.91  Channel: 5036.37  Uncertaincy: 2.05822
+	Energy: 5126.78  Channel: 5076.11  Uncertaincy: 2.05822
+	Energy: 5139.1  Channel: 5088.7  Uncertaincy: 2.05822
+	Energy: 5370.96  Channel: 5781.24  Uncertaincy: 1.2509e+07
+	Energy: 5425.87  Channel: 5837.36  Uncertaincy: 1.2509e+07
+	Energy: 5468.71  Channel: 5881.16  Uncertaincy: 1.2509e+07
+	Energy: 5746.29  Channel: 5095.7  Uncertaincy: 165.38
+	Energy: 5788.49  Channel: 5138.84  Uncertaincy: 165.38
 Results: 
-	Offset: -5.0664e+10 ± 7.6335e+07
-	Slope:  9.60733e+06 ± 14477.2
-	Chi^2/ndf:  101317/7 = 14473.8
+	Offset: 84.7245 ± 3.44457
+	Slope:  0.993338 ± 0.000860432
+	Chi^2/ndf:  26.7035/7 = 3.81479
 Covariance matrix
-	5.82704e+15	-1.10291e+12
-	-1.10291e+12	2.09589e+08
+	11.8651	-0.00287618
+	-0.00287618	7.40342e-07
 Warnings:
 	W1: Peaks ordering is jumbled. Peak finding did probably not succed.
-	W1: Peaks ordering is jumbled. Peak finding did probably not succed.
-	W1: Peaks ordering is jumbled. Peak finding did probably not succed.
-	W1: Peaks ordering is jumbled. Peak finding did probably not succed.
-	W1: Peaks ordering is jumbled. Peak finding did probably not succed.
-	W1: Peaks ordering is jumbled. Peak finding did probably not succed.
-	W1: Peaks ordering is jumbled. Peak finding did probably not succed.
-	W11: P value 0.000000 is small than cutoff (0.050000)
-	W12: Residuals (9) is larger than 5.000000 keV
+	W11: P value 0.000377 is small than cutoff (0.050000)
+	W12: Residuals (5) is larger than 5.000000 keV
 ======================================================
 Calibrating Back
 ======================================================

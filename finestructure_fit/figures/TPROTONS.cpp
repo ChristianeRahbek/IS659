@@ -1,5 +1,5 @@
 //
-//
+// Made by Christiane 23/01-2023
 //
 
 #include "THStack.h"
@@ -9,32 +9,29 @@
 #include "TTree.h"
 #include "TLegend.h"
 
-void hstack(bool bat) {
+void TPROTONS() {
     //defining each histogram
-    //bool bat = false;
-    std::string addition;
-    if(bat) addition = "bat/";
-    else addition = "";
 
-    auto *f= new TFile(("/mnt/d/IS659/finestructure_fit/analysis1/output/" + addition + "Run167mlio.root").c_str());
+    auto *f= new TFile("/mnt/d/IS659/finestructure_fit/analysis1/output/Run167mlio.root");
     auto *tr=(TTree*)f->Get("a");
 
-
-    auto h1st = new TH1F("h1st", "h1st", 16, 1, 17);
-    tr -> Draw("BI >> h1st");
+    auto h1st = new TH1F("h1st", "h1st", 1000, 0 , 4000);
+    tr -> Draw("TPROTONS >> h1st");
     h1st ->SetLineColor(kRed);
 
-    auto h2st = new TH1F("h2st", "h2st", 16, 1, 17);
-    tr -> Draw("BI >> h2st", "Edep1[0] > 0 && Edep3[1] > 0 && abs(Edep1[0]-Edep3[1])<400 && abs(BT[0]-BT[1]) < 3000");
+    auto h2st = new TH1F("h2st", "h2st", 1000, 0 , 4000);
+    tr -> Draw("TPROTONS >> h2st", "Edep1[0] > 0 && Edep3[1] > 0 && abs(Edep1[0]-Edep3[1]) < 400");
     h2st ->SetLineColor(kBlue);
 
-    auto h3st = new TH1F("h3st", "h3st", 16, 1, 17);
-    tr -> Draw("BI >> h3st", "Edep0[0] > 0 && Edep2[1] > 0 && abs(Edep0[0]-Edep2[1])<400 && abs(BT[0]-BT[1]) < 3000");
+    auto h3st = new TH1F("h3st", "h3st", 1000, 0 , 4000);
+    //tr -> Draw("TPROTONS >> h3st", "Edep1[0] > 0 && Edep2[1] > 0 && abs(Edep1[0]-Edep2[1]) > 400");
+    tr -> Draw("TPROTONS >> h3st", "Edep1[0] > 0 && Edep2[1] > 0");
     h3st ->SetLineColor(kGreen);
 
-    auto h4st = new TH1F("h4st", "h4st", 16, 1, 17);
-    tr -> Draw("BI >> h4st", "abs(BT[0]-BT[1]) < 3000");
-    h4st ->SetLineColor(kOrange);
+    auto h4st = new TH1F("h4st", "h4st", 1000, 0 , 4000);
+    //tr -> Draw("TPROTONS >> h4st", "Edep1[0] > 0 && Edep1[1] > 0 && abs(Edep1[0]-Edep1[1]) > 400");
+    tr -> Draw("TPROTONS >> h4st", "Edep1[0] > 0 && Edep1[1] > 0");
+    h3st ->SetLineColor(kOrange);
 
      /*
     auto h4st = new TH1F("h4st", "h4st", 1000, 200 , 8000);
@@ -47,7 +44,7 @@ void hstack(bool bat) {
     */
 
     //Plotting every histogram together
-    auto hs = new THStack("hs","Strip distribution");
+    auto hs = new THStack("hs","TPROTONS");
     hs->Add(h1st, "hist");
     hs->Add(h2st, "hist");
     hs->Add(h3st, "hist");
@@ -57,15 +54,15 @@ void hstack(bool bat) {
     auto l = new TLegend();
 
     l -> AddEntry(h1st, "Without gating", "L");
-    l -> AddEntry(h2st, "Det 2 & 4, main peak with shoulders", "L");
-    l -> AddEntry(h3st, "Det 1 & 3, main peak with shoulders", "L");
-    l -> AddEntry(h4st, "Main peak w. shoulders, all detectors", "L");
+    l -> AddEntry(h2st, "8Li (~180 degrees)", "L");
+    l -> AddEntry(h3st, "~90 degrees", "L");
+    l -> AddEntry(h4st, "~0 degrees", "L");
     //l -> AddEntry(h5st, "Edep3", "L");
 
     hs->Draw("nostack");
     l->Draw();
 
-    hs->SaveAs(("/mnt/d/IS659/finestructure_fit/analysis1/output/" + addition + "Strip_distribution_Back.png").c_str());
+    hs->SaveAs("TPROTONS.png");
 /*
  * UNCOMMENT TO STACK HISTOGRAMS AS WELL
     TCanvas *cst = new TCanvas("cst","stacked hists",10,10,700,700);

@@ -21,19 +21,19 @@ void hstack(bool bat) {
 
 
     auto h1st = new TH1F("h1st", "h1st", 16, 1, 17);
-    tr -> Draw("BI >> h1st");
+    tr -> Draw("FI >> h1st");
     h1st ->SetLineColor(kRed);
 
     auto h2st = new TH1F("h2st", "h2st", 16, 1, 17);
-    tr -> Draw("BI >> h2st", "Edep1[0] > 0 && Edep3[1] > 0 && abs(Edep1[0]-Edep3[1])<400 && abs(BT[0]-BT[1]) < 3000");
+    tr -> Draw("FI >> h2st", "Edep1[0] > 0 && Edep3[1] > 0 && abs(Edep1[0]-Edep3[1])<400 && abs(BT[0]-BT[1]) < 800");
     h2st ->SetLineColor(kBlue);
 
     auto h3st = new TH1F("h3st", "h3st", 16, 1, 17);
-    tr -> Draw("BI >> h3st", "Edep0[0] > 0 && Edep2[1] > 0 && abs(Edep0[0]-Edep2[1])<400 && abs(BT[0]-BT[1]) < 3000");
+    tr -> Draw("FI >> h3st", "Edep0[0] > 0 && Edep2[1] > 0 && abs(Edep0[0]-Edep2[1])<400 && abs(BT[0]-BT[1]) < 800");
     h3st ->SetLineColor(kGreen);
 
     auto h4st = new TH1F("h4st", "h4st", 16, 1, 17);
-    tr -> Draw("BI >> h4st", "abs(BT[0]-BT[1]) < 3000");
+    tr -> Draw("FI >> h4st", "abs(BT[0]-BT[1]) < 800");
     h4st ->SetLineColor(kOrange);
 
      /*
@@ -57,9 +57,9 @@ void hstack(bool bat) {
     auto l = new TLegend();
 
     l -> AddEntry(h1st, "Without gating", "L");
-    l -> AddEntry(h2st, "Det 2 & 4, main peak with shoulders", "L");
-    l -> AddEntry(h3st, "Det 1 & 3, main peak with shoulders", "L");
-    l -> AddEntry(h4st, "Main peak w. shoulders, all detectors", "L");
+    l -> AddEntry(h2st, "Det 2 & 4, main peak without shoulders", "L");
+    l -> AddEntry(h3st, "Det 1 & 3, main peak without shoulders", "L");
+    l -> AddEntry(h4st, "Main peak w.o. shoulders, all detectors", "L");
     //l -> AddEntry(h5st, "Edep3", "L");
 
     hs->Draw("nostack");

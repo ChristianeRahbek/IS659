@@ -20,7 +20,6 @@ void bat(int run_num) {
   run_num_padded << setw(3) << setfill('0') << run_num; //3 0's before run number as a string???
   string file_name = "Run" + run_num_padded.str() + "mlio.root";
   auto c = new TChain("a");
-  // possible to give file (char* path) as relative or absolute path, but it MUST be located in data/bpa
   c->Add((EUtil::getProjectRoot() + dataPath + EUtil::getBasename(file_name)).c_str());
 
   UInt_t max_hits = 10;

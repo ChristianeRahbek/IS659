@@ -4,10 +4,10 @@
 #include <string>
 #include <regex>
 
-namespace EUtil {
-  /* Returns "/mnt/d/IS659" */
+namespace ANALYSIS {
+  /* Returns "/mnt/d/IS659/finestructure_fit/figures" */
   std::string getProjectRoot() {
-    return "/mnt/d/IS659";
+    return "/mnt/d/IS659/finestructure_fit/figures";
   }
 
   /* Returns "/home/christiane" */
@@ -18,9 +18,7 @@ namespace EUtil {
   /* Returns "/home/christiane/path/to/file.xyz" of input "~/path/to/file.xyz" */
   std::string expandPathWithTilde(const std::string &path) {
     std::string result = path.substr(path.find('~') + 1);
-    if (result.size() != path.size()) {
-      result.insert(0, getHomeDir());
-    }
+    result.insert(0, getHomeDir());
     return result;
   }
 
@@ -52,20 +50,6 @@ namespace EUtil {
   std::string getParentPath(const std::string &path) {
     std::string base = getBasename(path);
     return path.substr(0, path.size() - base.size());
-  }
-
-  /* Appends string 'STR' to stem of path: "path/to/file.xyz" becomes "path/to/fileSTR.xyz" */
-  std::string appendToStem(const std::string &path, const std::string &string) {
-    return getParentPath(path) + getStem(path) + string + "." + getExtension(path);
-  }
-
-  /* Remove trailing slash(es) from string */
-  std::string removeTrailingSlashes(const std::string &path) {
-    std::string result = path;
-    while (result[result.size() - 1] == '/') {
-      result = result.substr(0, result.size() - 1);
-    }
-    return result;
   }
 
 }

@@ -248,6 +248,16 @@ public:
     }
   }
 
+  void timeCalibration(){
+      for(auto &hit: hits) {
+          auto tf = hit.TF;
+          auto tb = hit.TB;
+          if(abs(tf-tb)>400) { //only change time if it is not already alligned
+
+          }
+      }
+  }
+
   void doAnalysis() {
     if (hits.empty()) return;
     //mul = hits.size();

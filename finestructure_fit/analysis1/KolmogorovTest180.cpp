@@ -36,9 +36,8 @@ void KolmogorovTest180(){
     auto *myTree=(TTree*)myfile->Get("a");
 
     auto myHist = new TH1F("myhist", "myhist", 7000,0,3500);
-    myTree->Draw("TPROTONS >> myhist","180/3.14159*acos((dir[0].X()*dir[1].X() + dir[0].Y()*dir[1].Y()+dir[0].Z()*dir[1].Z())/(pow(pow(dir[0].X(),2)+pow(dir[0].Y(),2)+pow(dir[0].Z(),2), 1/2)*pow(pow(dir[1].X(),2)+pow(dir[1].Y(),2)+pow(dir[1].Z(),2),1/2)))<130 && ((Edep0[0]>0 && Edep2[1]>0) || (Edep2[0]>0 && Edep0[1]>0) || (Edep1[0]>0 && Edep3[1]>0) || (Edep3[0]>0 && Edep1[1]>0)) && abs(FT[1]-FT[0])<1000", "same");
+    myTree->Draw("TPROTONS >> myhist","180/3.14159*acos((dir[0].X()*dir[1].X() + dir[0].Y()*dir[1].Y()+dir[0].Z()*dir[1].Z())/(pow(pow(dir[0].X(),2)+pow(dir[0].Y(),2)+pow(dir[0].Z(),2), 1/2)*pow(pow(dir[1].X(),2)+pow(dir[1].Y(),2)+pow(dir[1].Z(),2),1/2)))<130 && ((Edep0[0]>0 && Edep2[1]>0) || (Edep2[0]>0 && Edep0[1]>0) || (Edep1[0]>0 && Edep3[1]>0) || (Edep3[0]>0 && Edep1[1]>0)) && abs(FT[1]-FT[0])<1000 && abs(Edssd[0]-Edssd[1])>500", "same");
 
-    
     Double_t* sampleMads = new Double_t[madsHist->GetEntries()];
     Double_t* sampleMyAng = new Double_t[myHist->GetEntries()];
 
@@ -62,6 +61,10 @@ void KolmogorovTest180(){
 
     cumMads->Draw();
     cumMine->Draw("same");
-    
+
+    auto canvNormHists = new TCanvas();
+
+    myHist->DrawNormalized();
+    madsHist->DrawNormalized("same");
 
 }

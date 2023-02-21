@@ -2,6 +2,7 @@
 #include <TLorentzVector.h>
 #include "ParticleType.h"
 
+
 struct Hit {
     double deposited;
     double paddeposited;
@@ -27,5 +28,5 @@ struct Hit {
     bool canBeBeta;
     size_t index;
 
-    TLorentzVector lVector, lVectorBeta, lVectorAlpha;
+    TLorentzVector lVector_alpha, lVector_triton, lVectorBeta, lVectorAlpha;
 };

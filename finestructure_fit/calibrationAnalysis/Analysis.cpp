@@ -187,13 +187,11 @@ public:
                     auto &calc = targetCalcs[intersection.index];
                     //hit.E += calc->getTotalEnergyCorrection(hit.E, intersection.transversed);
 
-/*
-                    if(i == 2 || i == 3){ //if downstream
+                    if(i == 1 || i == 2){ //if downstream
                         auto traveled = t_thick-stop_length;
                         hit.E += calc->getTotalEnergyCorrection(hit.E, traveled/abs(cos(from.Angle(t_c))));
                     }
                     else hit.E += calc->getTotalEnergyCorrection(hit.E, stop_length/abs(cos(from.Angle(t_c))));
-*/
                 }
 
                 hit.index = i;

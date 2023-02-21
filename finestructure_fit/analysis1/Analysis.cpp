@@ -34,51 +34,62 @@ public:
   MyAnalysis(Target &target, TFile *output) : target(target) {
     NUM = 0;
 
+    beamEnergy = 30; //keV
+    beamVector = constructBeamVector(Ion(2,8), Ion(6,12), beamEnergy);
+    cmBoost = -beamVector.BoostVector();
+
+    TRITON = new ParticleType("H3");
+
     t = new TTree("a", "a");
     t->Branch("mul", &mul);
     t->Branch("num", &NUM);
 
-    v_dir = make_unique<DynamicBranchVector<TVector3>>(*t, "dir");
-    v_pos = make_unique<DynamicBranchVector<TVector3>>(*t, "pos");
+    v_dir0 = make_unique<DynamicBranchVector<TVector3>>(*t, "dir0");
+    v_pos0 = make_unique<DynamicBranchVector<TVector3>>(*t, "pos0");
+    v_dir1 = make_unique<DynamicBranchVector<TVector3>>(*t, "dir1");
+    v_pos1 = make_unique<DynamicBranchVector<TVector3>>(*t, "pos1");
 
-    v_theta = make_unique<DynamicBranchVector<double>>(*t, "theta", "mul");
-    v_ang = make_unique<DynamicBranchVector<double>>(*t, "angle", "mul");
+    v_pnat = make_unique<DynamicBranchVector<TVector3>>(*t, "pnat");
+    v_pnta = make_unique<DynamicBranchVector<TVector3>>(*t, "pnta");
+    v_Enat = make_unique<DynamicBranchVector<double>>(*t, "Enat", "mul");
+    v_Enta = make_unique<DynamicBranchVector<double>>(*t, "Enta", "mul");
 
-    v_Edssd = make_unique<DynamicBranchVector<double>>(*t, "Edssd", "mul");
-    v_Ea = make_unique<DynamicBranchVector<double>>(*t, "Ea", "mul");
-    v_BE = make_unique<DynamicBranchVector<double>>(*t, "BE", "mul");
-    v_FE = make_unique<DynamicBranchVector<double>>(*t, "FE", "mul");
-    v_Et = make_unique<DynamicBranchVector<double>>(*t, "Et", "mul");
+    v_theta0 = make_unique<DynamicBranchVector<double>>(*t, "theta0", "mul");
+    v_ang0 = make_unique<DynamicBranchVector<double>>(*t, "angle0", "mul");
+    v_theta1 = make_unique<DynamicBranchVector<double>>(*t, "theta1", "mul");
+    v_ang1 = make_unique<DynamicBranchVector<double>>(*t, "angle1", "mul");
 
-    v_Edep_alphas = make_unique<DynamicBranchVector<double>>(*t, "Edep_alphas", "mul");
+    v_hitAng = make_unique<DynamicBranchVector<double>>(*t, "hitAng", "mul");
 
-    v_Edep0 = make_unique<DynamicBranchVector<double>>(*t, "Edep0", "mul");
-    v_Edep1 = make_unique<DynamicBranchVector<double>>(*t, "Edep1", "mul");
-    v_Edep2 = make_unique<DynamicBranchVector<double>>(*t, "Edep2", "mul");
-    v_Edep3 = make_unique<DynamicBranchVector<double>>(*t, "Edep3", "mul");
-
-
+    v_Edssd0 = make_unique<DynamicBranchVector<double>>(*t, "Edssd0", "mul");
     v_Ea0 = make_unique<DynamicBranchVector<double>>(*t, "Ea0", "mul");
-    v_Ea1 = make_unique<DynamicBranchVector<double>>(*t, "Ea1", "mul");
-    v_Ea2 = make_unique<DynamicBranchVector<double>>(*t, "Ea2", "mul");
-    v_Ea3 = make_unique<DynamicBranchVector<double>>(*t, "Ea3", "mul");
-
+    v_BE0 = make_unique<DynamicBranchVector<double>>(*t, "BE0", "mul");
+    v_FE0 = make_unique<DynamicBranchVector<double>>(*t, "FE0", "mul");
     v_Et0 = make_unique<DynamicBranchVector<double>>(*t, "Et0", "mul");
+    v_Edssd1 = make_unique<DynamicBranchVector<double>>(*t, "Edssd1", "mul");
+    v_Ea1 = make_unique<DynamicBranchVector<double>>(*t, "Ea1", "mul");
+    v_BE1 = make_unique<DynamicBranchVector<double>>(*t, "BE1", "mul");
+    v_FE1 = make_unique<DynamicBranchVector<double>>(*t, "FE1", "mul");
     v_Et1 = make_unique<DynamicBranchVector<double>>(*t, "Et1", "mul");
-    v_Et2 = make_unique<DynamicBranchVector<double>>(*t, "Et2", "mul");
-    v_Et3 = make_unique<DynamicBranchVector<double>>(*t, "Et3", "mul");
 
+    v_FT0 = make_unique<DynamicBranchVector<double>>(*t, "FT0", "mul");
+    v_BT0 = make_unique<DynamicBranchVector<double>>(*t, "BT0", "mul");
+    v_FT1 = make_unique<DynamicBranchVector<double>>(*t, "FT1", "mul");
+    v_BT1 = make_unique<DynamicBranchVector<double>>(*t, "BT1", "mul");
 
-    v_FT = make_unique<DynamicBranchVector<double>>(*t, "FT", "mul");
-    v_BT = make_unique<DynamicBranchVector<double>>(*t, "BT", "mul");
+    v_dE0 = make_unique<DynamicBranchVector<double>>(*t, "dE0", "mul");
+    v_Ecm0 = make_unique<DynamicBranchVector<double>>(*t, "Ecm0", "mul");
+    v_dE1 = make_unique<DynamicBranchVector<double>>(*t, "dE1", "mul");
+    v_Ecm1 = make_unique<DynamicBranchVector<double>>(*t, "Ecm1", "mul");
 
-    v_dE = make_unique<DynamicBranchVector<double>>(*t, "dE", "mul");
-    v_Ecm = make_unique<DynamicBranchVector<double>>(*t, "Ecm", "mul");
+    v_i0 = make_unique<DynamicBranchVector<short>>(*t, "id0", "mul");
+    v_i1 = make_unique<DynamicBranchVector<short>>(*t, "id1", "mul");
 
-    v_i = make_unique<DynamicBranchVector<short>>(*t, "id", "mul");
+    v_F0 = make_unique<DynamicBranchVector<short>>(*t, "FI0", "mul");
+    v_B0 = make_unique<DynamicBranchVector<short>>(*t, "BI0", "mul");
+    v_F1 = make_unique<DynamicBranchVector<short>>(*t, "FI1", "mul");
+    v_B1 = make_unique<DynamicBranchVector<short>>(*t, "BI1", "mul");
 
-    v_F = make_unique<DynamicBranchVector<short>>(*t, "FI", "mul");
-    v_B = make_unique<DynamicBranchVector<short>>(*t, "BI", "mul");
 
     t->Branch("TPROTONS", &TPROTONS);
 
@@ -182,14 +193,13 @@ public:
         double stop_length = 0.2868* pow(10,-3); //how far the beam goes to be stopped
 
 
-
         /* Energy corrections in target */
         auto &from = position;
         for (auto &intersection: target.getIntersections(from, target.getCenter() /*NOT IN CENTER!*/)) {
             auto &calca = aTargetCalcs[intersection.index];
             auto &calct = tTargetCalcs[intersection.index];
             auto traveled = target.getThickness() - stop_length;
-            if(i == 2 || i == 3) {
+            if(i == 1 || i == 2) { //downstream detectorer
                 Ea += calca->getTotalEnergyCorrection(Ea, traveled/abs(cos(from.Angle(target.getCenter()))));
                 Et += calct->getTotalEnergyCorrection(Et, traveled/abs(cos(from.Angle(target.getCenter()))));
             }
@@ -205,106 +215,115 @@ public:
         hit.BE = BE;
         hit.FE = FE;
 
-        //Saving energies from different detectors
-        if(i == 0) {
-            hit.Edep0 = eDssd;
-            hit.Edep1 = 0;
-            hit.Edep2 = 0;
-            hit.Edep3 = 0;
-            hit.Ea0 = Ea;
-            hit.Et0 = Et;
-        }
-        else if (i == 1){
-            hit.Edep1 = eDssd;
-            hit.Edep0 = 0;
-            hit.Edep2 = 0;
-            hit.Edep3 = 0;
-            hit.Ea1 = Ea;
-            hit.Et1 = Et;
-        }
-        else if (i == 2){
-            hit.Edep2 = eDssd;
-            hit.Edep0 = 0;
-            hit.Edep1 = 0;
-            hit.Edep3 = 0;
-            hit.Ea2 = Ea;
-            hit.Et2 = Et;
-        }
-        else if (i == 3){
-            hit.Edep3 = eDssd;
-            hit.Edep0 = 0;
-            hit.Edep1 = 0;
-            hit.Edep2 = 0;
-            hit.Ea3 = Ea;
-            hit.Et3 = Et;
-        }
 
-        //finding only
-
+        auto impulse_alpha = sqrt(2*Ea*ALPHA_MASS);
+        auto impulse_triton = sqrt(2*Et*TRITON->mass);
 
         hit.index = i;
+        hit.lVector_alpha = {impulse_alpha*hit.direction, hit.Ea+ALPHA_MASS};
+        hit.lVector_triton = {impulse_triton*hit.direction, hit.Et+TRITON->mass};
         hits.emplace_back(move(hit));
       }
     }
   }
 
-  void timeCalibration(){
-      for(auto &hit: hits) {
-          auto tf = hit.TF;
-          auto tb = hit.TB;
-          if(abs(tf-tb)>400) { //only change time if it is not already alligned
-
-          }
-      }
-  }
 
   void doAnalysis() {
-    if (hits.empty()) return;
-    //mul = hits.size();
+      auto mult = hits.size();
 
-    for(auto &hit: hits) {
-        v_pos->add(hit.position);
-        v_dir->add(hit.direction);
-        v_theta->add(hit.theta * TMath::RadToDeg());
+      //if(hits.empty()) return;
+      if (mult<2) return;
 
-        v_Ea->add(hit.Ea);
-        v_Et->add(hit.Et);
-        v_Edssd -> add(hit.Edssd);
-        v_BE->add(hit.BE);
-        v_FE->add(hit.FE);
+      for(size_t i = 0; i < mult; i++) {
+          auto h0 = hits[i];
 
-        v_Edep0 -> add(hit.Edep0);
-        v_Edep1 -> add(hit.Edep1);
-        v_Edep2 -> add(hit.Edep2);
-        v_Edep3 -> add(hit.Edep3);
+          auto pl0a = h0.lVector_alpha;
+          auto pl0t = h0.lVector_triton;
 
-        v_Edep_alphas -> add(hit.Edep_alphas);
+          auto p0a = TVector3(pl0a.Px(), pl0a.Py(), pl0a.Pz());
+          auto p0t = TVector3(pl0t.Px(), pl0t.Py(), pl0t.Pz());
 
-        v_Ea0 -> add(hit.Ea0);
-        v_Ea1 -> add(hit.Ea1);
-        v_Ea2 -> add(hit.Ea2);
-        v_Ea3 -> add(hit.Ea3);
+          for(size_t j = i+1; i <mult; i++) {
+              auto h1 = hits[j];
 
-        v_Et0 -> add(hit.Ea0);
-        v_Et1 -> add(hit.Ea1);
-        v_Et2 -> add(hit.Ea2);
-        v_Et3 -> add(hit.Ea3);
+              auto pl1a = h1.lVector_alpha;
+              auto pl1t = h1.lVector_triton;
 
-        v_dE->add(hit.dE);
-            //v_Ecm->add(Ecm);
-        v_ang->add(hit.angle * TMath::RadToDeg());
+              auto p1a = TVector3(pl1a.Px(), pl1a.Py(), pl1a.Pz());
+              auto p1t = TVector3(pl1t.Px(), pl1t.Py(), pl1t.Pz());
 
-        v_i->add(static_cast<short>(hit.index));
-        v_F->add(hit.fseg);
-        v_B->add(hit.bseg);
-        v_FT->add(hit.TF);
-        v_BT->add(hit.TB);
+              auto p_at = p0a + p1t;
+              auto p_ta = p0t + p1a;
 
-        mul++;
+              //auto pn_at = TVector3(0,0,0) - TVector3(p_at.Px(),p_at.Py(),p_at.Pz());
+              //auto pn_ta = TVector3(0,0,0) - TVector3(p_ta.Px(),p_ta.Py(),p_ta.Pz());
+              //p_at.Boost(cmBoost);
+              //p_ta.Boost(cmBoost);
+              auto pn_at = TVector3(0,0,0) - p_at;
+              auto pn_ta = TVector3(0,0,0) - p_ta;
+
+              auto En_at = pow(pn_at.Mag(), 2)/(2*NEUTRON_MASS);
+              auto En_ta = pow(pn_ta.Mag(), 2)/(2*NEUTRON_MASS);
+
+              v_pnat->add(pn_at);
+              v_pnta->add(pn_ta);
+
+              v_Enat->add(En_at);
+              v_Enta->add(En_ta);
+
+              v_pos0->add(h0.position);
+              v_dir0->add(h0.direction);
+              v_theta0->add(h0.theta * TMath::RadToDeg());
+              v_pos1->add(h1.position);
+              v_dir1->add(h1.direction);
+              v_theta1->add(h1.theta * TMath::RadToDeg());
+
+              v_Ea0->add(h0.Ea);
+              v_Et0->add(h0.Et);
+              v_Edssd0->add(h0.Edssd);
+              v_BE0->add(h0.BE);
+              v_FE0->add(h0.FE);
+              v_Ea1->add(h1.Ea);
+              v_Et1->add(h1.Et);
+              v_Edssd1->add(h1.Edssd);
+              v_BE1->add(h1.BE);
+              v_FE1->add(h1.FE);
+
+              v_dE0->add(h0.dE);
+              v_dE1->add(h1.dE);
+              //v_Ecm->add(Ecm);
+              v_ang0->add(h0.angle * TMath::RadToDeg());
+              v_ang1->add(h1.angle * TMath::RadToDeg());
+
+              v_i0->add(static_cast<short>(h0.index));
+              v_F0->add(h0.fseg);
+              v_B0->add(h0.bseg);
+              v_FT0->add(h0.TF);
+              v_BT0->add(h0.TB);
+              v_i1->add(static_cast<short>(h1.index));
+              v_F1->add(h1.fseg);
+              v_B1->add(h1.bseg);
+              v_FT1->add(h1.TF);
+              v_BT1->add(h1.TB);
+
+              auto hitAngle = h1.position.Angle(h0.position)*TMath::RadToDeg();
+
+              v_hitAng->add(hitAngle);
+
+              mul++;
+          }
     }
   }
 
-  void terminate() override {
+  static TLorentzVector constructBeamVector(const Ion& beam,
+                                            const Ion& targetIon,
+                                            double beamEnergy) {
+      TLorentzVector plbeam( TVector3(0,0,sqrt(2*beamEnergy*beam.getMass())), beamEnergy+beam.getMass() );
+      TLorentzVector pltarget( TVector3(0,0,0), targetIon.getMass() );
+      return plbeam + pltarget;
+  }
+
+    void terminate() override {
     AbstractSortedAnalyzer::terminate();
     gDirectory->WriteTObject(t);
   }
@@ -312,27 +331,26 @@ public:
   void clear() {
     mul = 0;
     AUSA::clear(
-        *v_Et, *v_Ea, *v_theta, *v_Edssd,
-        *v_Edep0, *v_Edep1, *v_Edep2, *v_Edep3,
-        *v_Ea0, *v_Ea1, *v_Ea2, *v_Ea3,
-        *v_Et0, *v_Et1, *v_Et2, *v_Et3,
-        *v_i, *v_FE, *v_BE,
-        *v_F, *v_B, *v_Ecm,
-        *v_ang, *v_pos, *v_dir,
-        *v_dE, *v_FT, *v_BT, *v_Edep_alphas
+        *v_Et0, *v_Ea0, *v_theta0, *v_Edssd0, *v_Et1, *v_Ea1, *v_theta1, *v_Edssd1,
+        *v_i0, *v_FE0, *v_BE0, *v_i1, *v_FE1, *v_BE1, *v_Enat, *v_Enta,
+        *v_F0, *v_B0, *v_Ecm0, *v_F1, *v_B1, *v_Ecm1,
+        *v_ang0, *v_pos0, *v_dir0, *v_ang1, *v_pos1, *v_dir1,
+        *v_dE0, *v_FT0, *v_BT0, *v_dE1, *v_FT1, *v_BT1, *v_hitAng, *v_pnat, *v_pnta
     );
   }
 
   int NUM;
   TTree *t;
-  unique_ptr<DynamicBranchVector<TVector3>> v_dir, v_pos;
-  unique_ptr<DynamicBranchVector<double>> v_Edssd, v_Edep0, v_Edep1, v_Edep2, v_Edep3, v_Edep_alphas;
-  unique_ptr<DynamicBranchVector<double>> v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;
-  unique_ptr<DynamicBranchVector<double>> v_Ea0, v_Ea1, v_Ea2, v_Ea3, v_Et0, v_Et1, v_Et2, v_Et3;
-  unique_ptr<DynamicBranchVector<short>> v_i;
-  unique_ptr<DynamicBranchVector<short>> v_F, v_B;
-  unique_ptr<DynamicBranchVector<double>> v_ang;
-  unique_ptr<DynamicBranchVector<double>> v_FT, v_BT;
+  unique_ptr<DynamicBranchVector<TVector3>> v_dir0, v_pos0, v_dir1, v_pos1;
+  unique_ptr<DynamicBranchVector<TVector3>> v_pnat, v_pnta;
+  unique_ptr<DynamicBranchVector<double>> v_Edssd0, v_Edssd1, v_Enat, v_Enta;
+  unique_ptr<DynamicBranchVector<double>> v_Ea0, v_Et0, v_BE0, v_FE0, v_theta0, v_dE0, v_Ecm0;
+  unique_ptr<DynamicBranchVector<double>> v_Ea1, v_Et1, v_BE1, v_FE1, v_theta1, v_dE1, v_Ecm1;
+  unique_ptr<DynamicBranchVector<short>> v_i0, v_i1;
+  unique_ptr<DynamicBranchVector<short>> v_F0, v_B0, v_F1, v_B1;
+  unique_ptr<DynamicBranchVector<double>> v_ang0, v_ang1, v_hitAng;
+  unique_ptr<DynamicBranchVector<double>> v_FT0, v_BT0, v_FT1, v_BT1;
+
 
   UInt_t mul{}, TPROTONS{};
   vector<Hit> hits;
@@ -341,6 +359,10 @@ public:
   vector<unique_ptr<EnergyLossRangeInverter>> aTargetCalcs, tTargetCalcs;
   vector<double> deadlayerF, deadlayerB, deadlayerP;
   Target &target;
+  ParticleType* TRITON;
+  TLorentzVector beamVector;
+  double beamEnergy;
+  TVector3 cmBoost;
   bool simulation = false;
 };
 

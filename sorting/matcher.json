@@ -44,8 +44,6 @@
   },
   "SSD" : {
     "__GLOBAL__" : {
-      "low_cut" : 200,
-      "high_cut" : 10000
     }
   }
 }

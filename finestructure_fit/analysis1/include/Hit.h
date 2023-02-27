@@ -8,12 +8,10 @@ struct Hit {
     double paddeposited;
 
     double Ea, Et, FE, BE, Edssd, dE,
-           EBeta, fbdiff, Ecm, Edep_alphas,
-           Edep0, Edep1, Edep2, Edep3, /*Deposited energy in each detector*/
-           Ea0, Ea1, Ea2, Ea3, Et0, Et1, Et2, Et3; //alpha and triton energies in each detector
+           EBeta, fbdiff, Ecm, Edep_alphas, EPlastic;
 
 
-    double TF, TB, TPad, T;
+    double TF, TB, TPlastic, T;
 
     double tarTrav, detTrav;
     double Ectarget;

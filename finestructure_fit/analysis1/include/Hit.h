@@ -7,7 +7,7 @@ struct Hit {
     double deposited;
     double paddeposited;
 
-    double Ea, Et, FE, BE, Edssd, dE,
+    double Ea, Et, FE, BE, Edssd, dE, Edep,
            EBeta, fbdiff, Ecm, Edep_alphas, EPlastic;
 
 

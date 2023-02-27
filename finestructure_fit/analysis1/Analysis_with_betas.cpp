@@ -17,6 +17,7 @@
 #include <ctime>
 #include <libconfig.h++>
 #include "projectutil.h"
+#include "IS659Detector.h"
 
 
 using namespace std;
@@ -28,6 +29,7 @@ using namespace AUSA::EnergyLoss;
 using namespace AUSA::Constants;
 using namespace libconfig;
 
+#define NAN_TVECTOR3 TVector3(NAN, NAN, NAN)
 
 class MyAnalysis : public AbstractSortedAnalyzer {
 public:
@@ -44,7 +46,7 @@ public:
         v_theta = make_unique<DynamicBranchVector<double>>(*t, "theta", "mul");
         v_ang = make_unique<DynamicBranchVector<double>>(*t, "angle", "mul");
 
-        v_Edssd = make_unique<DynamicBranchVector<double>>(*t, "Edssd", "mul");
+        v_Edep = make_unique<DynamicBranchVector<double>>(*t, "Edep", "mul");
         v_Ea = make_unique<DynamicBranchVector<double>>(*t, "Ea", "mul");
         v_BE = make_unique<DynamicBranchVector<double>>(*t, "BE", "mul");
         v_FE = make_unique<DynamicBranchVector<double>>(*t, "FE", "mul");
@@ -76,11 +78,21 @@ public:
 
     void setup(const SortedSetupOutput &output) override {
         AbstractSortedAnalyzer::setup(output);
-        for (size_t i = 0; i < output.dssdCount(); ++i) {
-            auto dl = getFrontDeadLayer(output.getDssdOutput(i).detector());
-            auto dlB = getBackDeadLayer(output.getDssdOutput(i).detector());
-            deadlayerF.push_back(dl);
-            deadlayerB.push_back(dlB);
+
+        double dl, dlB;
+        for(const auto &entry : detector_map) {
+            auto id = entry.first; //getting inputs of detector
+            auto det = entry.second;
+
+            if(det->getDetType() == IS659Type::SquareDSSD) {
+                dl = getFrontDeadLayer(output.getDssdOutput(id).detector());
+                dlB = getBackDeadLayer(output.getDssdOutput(id).detector());
+                deadlayerF.push_back(dl);
+                deadlayerB.push_back(dlB);
+            }
+            else{
+                //no deadlayer corrections in Plastics
+            }
         }
     }
 
@@ -95,120 +107,158 @@ public:
         NUM++;
     }
 
-
     void findHits() {
-        for (size_t i = 0; i < output.dssdCount(); i++) {
-            auto &o = output.getDssdOutput(i);
-            auto &p = output.getSingleOutput(i);
-            auto &d = o.detector();
-            auto m = AUSA::mul(o);
-
-            for (UInt_t j = 0; j < m; j++) {
-                Hit hit;
-
-                auto dE = fEnergy(o, j) - bEnergy(o, j);
-                hit.dE = dE;
-
-                auto eDssd = energy(o, j);
-                auto eFDssd = fEnergy(o, j);
-                auto eBDssd = bEnergy(o, j);
-                //auto ePlastic = p.energy(0);
-
-
-                auto BI = bSeg(o, j);
-                auto FI = fSeg(o, j);
-                hit.fseg = short(FI);
-                hit.bseg = short(BI);
-
-                auto position = o.detector().getUniformPixelPosition(FI, BI);
-                auto origin = target.getCenter();
-                hit.position = position;
-                auto direction = (position - origin).Unit();
-                hit.direction = direction;
-                hit.theta = hit.direction.Theta();
-
-
-                if (!simulation) {
-                    hit.TF = fTime(o, j);
-                    hit.TB = bTime(o, j);
-                    //hit.TPlastic = p.time(0);
-                } else {
-                    hit.TF = 42;
-                    hit.TB = 42;
-                    //hit.TPlastic = 42;
-                }
-
-                auto angle = hit.direction.Angle(-d.getNormal());
-                hit.angle = angle;
-
-                auto tF = deadlayerF[i] / abs(cos(angle));
-                auto tB = deadlayerB[i] / abs(cos(angle));
-                //auto tP = deadlayerP[i] / abs(cos(angle));
-
-                double Ea = 0.0;
-                double Et = 0.0;
-                double FE = 0.0;
-                double BE = 0.0;
-
-                /* Energy corrections in deadlayer */
-                Ea += eDssd;
-                Ea += aSiCalc->getTotalEnergyCorrection(Ea, tF);
-                Et += eDssd;
-                Et += tSiCalc->getTotalEnergyCorrection(Et, tF);
-
-                FE += eFDssd; //only energy correction on Ea and Et.
-                BE += eBDssd;
-
-
-                /* stop_length has to be given in mm, so it is also 0.1221 um
-                 * It is calculated at eloss.kern.phys.au.dk for E_beam = 30 keV*/
-                double stop_length = 0.2868 * pow(10, -3); //how far the beam goes to be stopped
-
-
-                /* Energy corrections in target */
-                auto &from = position;
-                for (auto &intersection: target.getIntersections(from, target.getCenter() /*NOT IN CENTER!*/)) {
-                    auto &calca = aTargetCalcs[intersection.index];
-                    auto &calct = tTargetCalcs[intersection.index];
-                    auto traveled = target.getThickness() - stop_length;
-                    if (i == 1 || i == 2) { //downstream detectorer
-                        Ea += calca->getTotalEnergyCorrection(Ea, traveled / abs(cos(from.Angle(target.getCenter()))));
-                        Et += calct->getTotalEnergyCorrection(Et, traveled / abs(cos(from.Angle(target.getCenter()))));
-                    } else {
-                        Ea += calca->getTotalEnergyCorrection(Ea,
-                                                              stop_length / abs(cos(from.Angle(target.getCenter()))));
-                        Et += calct->getTotalEnergyCorrection(Et,
-                                                              stop_length / abs(cos(from.Angle(target.getCenter()))));
-                    }
-                }
-
-                hit.Ea = Ea;
-                hit.Et = Et;
-                hit.Edssd = eDssd; //deposited energy in detector
-                hit.BE = BE;
-                hit.FE = FE;
-                //hit.EPlastic = ePlastic;
-
-
-                auto impulse_alpha = sqrt(2 * Ea * ALPHA_MASS);
-                auto impulse_triton = sqrt(2 * Et * TRITON->mass);
-
-                hit.lVector_alpha = {impulse_alpha * hit.direction, hit.Ea + ALPHA_MASS};
-                hit.lVector_triton = {impulse_triton * hit.direction, hit.Et + TRITON->mass};
-
-                hit.index = i;
-
-                hits.emplace_back(move(hit));
-            }
+        for(const auto &entry : detector_map) {
+            auto det = entry.second;
+            auto detType = det->getDetType();
+            if(detType == IS659Type::SquareDSSD) findDSSDHit(det);
+            else findPlasticHit(det);
         }
     }
 
+    void findDSSDHit(IS659Detector* detector) {
+        auto name = detector->getName();
+        auto &o = output.getDssdOutput(name);
+        auto &d = o.detector();
+        auto m = AUSA::mul(o);
+
+        for (UInt_t j = 0; j < m; j++) {
+            Hit hit;
+
+            auto id = detector->getId();
+
+            auto dE = fEnergy(o, j) - bEnergy(o, j);
+            hit.dE = dE;
+
+            auto Edep = energy(o, j);
+            auto eFDssd = fEnergy(o, j);
+            auto eBDssd = bEnergy(o, j);
+            //auto ePlastic = p.energy(0);
+
+            auto BI = bSeg(o, j);
+            auto FI = fSeg(o, j);
+            hit.fseg = short(FI);
+            hit.bseg = short(BI);
+
+            auto position = o.detector().getUniformPixelPosition(FI, BI);
+            auto origin = target.getCenter();
+            hit.position = position;
+            auto direction = (position - origin).Unit();
+            hit.direction = direction;
+            hit.theta = hit.direction.Theta();
+
+            if (!simulation) {
+                hit.TF = fTime(o, j);
+                hit.TB = bTime(o, j);
+                //hit.TPlastic = p.time(0);
+            } else {
+                hit.TF = 42;
+                hit.TB = 42;
+                //hit.TPlastic = 42;
+            }
+
+            auto angle = hit.direction.Angle(-d.getNormal());
+            hit.angle = angle;
+
+            auto tF = deadlayerF[id] / abs(cos(angle));
+            auto tB = deadlayerB[id] / abs(cos(angle));
+
+            double Ea = 0.0;
+            double Et = 0.0;
+            double FE = 0.0;
+            double BE = 0.0;
+
+            /* Energy corrections in deadlayer */
+            Ea += Edep;
+            Ea += aSiCalc->getTotalEnergyCorrection(Ea, tF);
+            Et += Edep;
+            Et += tSiCalc->getTotalEnergyCorrection(Et, tF);
+
+            FE += eFDssd; //only energy correction on Ea and Et.
+            BE += eBDssd;
+
+            /* stop_length has to be given in mm, so it is also 0.1221 um
+             * It is calculated at eloss.kern.phys.au.dk for E_beam = 30 keV*/
+            double stop_length = 0.2868 * pow(10, -3); //how far the beam goes to be stopped
+
+            /* Energy corrections in target */
+            auto &from = position;
+            for (auto &intersection: target.getIntersections(from, target.getCenter() /*NOT IN CENTER!*/)) {
+                auto &calca = aTargetCalcs[intersection.index];
+                auto &calct = tTargetCalcs[intersection.index];
+                auto traveled = target.getThickness() - stop_length;
+                if (id == 1 || id == 2) { //downstream detectorer
+                    Ea += calca->getTotalEnergyCorrection(Ea, traveled / abs(cos(from.Angle(target.getCenter()))));
+                    Et += calct->getTotalEnergyCorrection(Et, traveled / abs(cos(from.Angle(target.getCenter()))));
+                } else {
+                    Ea += calca->getTotalEnergyCorrection(Ea,
+                                                          stop_length / abs(cos(from.Angle(target.getCenter()))));
+                    Et += calct->getTotalEnergyCorrection(Et,
+                                                          stop_length / abs(cos(from.Angle(target.getCenter()))));
+                }
+            }
+
+            hit.Ea = Ea;
+            hit.Et = Et;
+            hit.Edep = Edep; //deposited energy in detector
+            hit.BE = BE;
+            hit.FE = FE;
+
+            hit.index = id;
+
+            hits.emplace_back(move(hit));
+        }
+    }
+
+    void findPlasticHit(IS659Detector* detector) {
+        auto name = detector->getName();
+        auto &o = output.getSingleOutput(name);
+        auto &d = o.detector();
+        auto m = AUSA::mul(o);
+
+        for (UInt_t j = 0; j < m; j++) {
+            Hit hit;
+
+            auto id = detector->getId();
+
+            auto Edep = o.energy(j);
+
+            hit.fseg = short(NAN);
+            hit.bseg = short(NAN);
+
+            auto origin = target.getCenter();
+            hit.position = NAN_TVECTOR3;
+            hit.direction = NAN_TVECTOR3;
+            hit.theta = NAN;
+
+            if (!simulation) {
+                hit.TF = o.time(j);
+                hit.TB = NAN;
+            } else {
+                hit.TF = 42;
+                hit.TB = 42;
+            }
+
+            hit.angle = NAN;
+
+            hit.Ea = NAN;
+            hit.Et = NAN;
+            hit.Edep = Edep; //deposited energy in detector
+            hit.BE = NAN;
+            hit.FE = NAN;
+            hit.dE = NAN;
+
+            hit.index = id;
+
+            hits.emplace_back(move(hit));
+        }
+    }
 
     void doAnalysis() {
         auto mult = hits.size();
 
-        //if(hits.empty()) return;
-        if (mult < 2) return;
+        if(hits.empty()) return;
+        //if (mult < 2) return;
 
         for (size_t i = 0; i < mult; i++) {
             auto h = hits[i];
@@ -219,7 +269,7 @@ public:
 
             v_Ea->add(h.Ea);
             v_Et->add(h.Et);
-            v_Edssd->add(h.Edssd);
+            v_Edep->add(h.Edep);
             v_BE->add(h.BE);
             v_FE->add(h.FE);
 
@@ -246,16 +296,27 @@ public:
     void clear() {
         mul = 0;
         AUSA::clear(
-                *v_dir, *v_pos, *v_Edssd, *v_Ea, *v_Et, *v_BE,
+                *v_dir, *v_pos, *v_Edep, *v_Ea, *v_Et, *v_BE,
                 *v_FE, *v_theta, *v_dE, *v_Ecm, *v_i, *v_F, *v_B,
                 *v_ang, *v_FT, *v_BT
         );
     }
 
+    const map<unsigned short, IS659Detector*> detector_map = {
+            {0, new IS659Detector(0, "U1", IS659Type::SquareDSSD)},
+            {1, new IS659Detector(1, "U2", IS659Type::SquareDSSD)},
+            {2, new IS659Detector(2, "U3", IS659Type::SquareDSSD)},
+            {3, new IS659Detector(3, "U4", IS659Type::SquareDSSD)},
+            {4, new IS659Detector(4, "P1", IS659Type::Plastic)},
+            {5, new IS659Detector(5, "P2", IS659Type::Plastic)},
+            {6, new IS659Detector(6, "P3", IS659Type::Plastic)},
+            {7, new IS659Detector(7, "P4", IS659Type::Plastic)}
+    };
+
     int NUM;
     TTree *t;
     unique_ptr<DynamicBranchVector<TVector3>> v_dir, v_pos;
-    unique_ptr<DynamicBranchVector<double>> v_Edssd;
+    unique_ptr<DynamicBranchVector<double>> v_Edep;
     unique_ptr<DynamicBranchVector<double>> v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;;
     unique_ptr<DynamicBranchVector<short>> v_i, v_F, v_B;
     unique_ptr<DynamicBranchVector<double>> v_ang;

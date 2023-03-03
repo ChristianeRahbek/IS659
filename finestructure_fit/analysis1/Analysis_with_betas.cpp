@@ -58,6 +58,10 @@ public:
         v_dE = make_unique<DynamicBranchVector<double>>(*t, "dE", "mul");
         v_Ecm = make_unique<DynamicBranchVector<double>>(*t, "Ecm", "mul");
 
+        v_posX = make_unique<DynamicBranchVector<double>>(*t, "posX", "mul");
+        v_posY = make_unique<DynamicBranchVector<double>>(*t, "posY", "mul");
+        v_posZ = make_unique<DynamicBranchVector<double>>(*t, "posZ", "mul");
+
         v_i = make_unique<DynamicBranchVector<short>>(*t, "id", "mul");
 
         v_F = make_unique<DynamicBranchVector<short>>(*t, "FI", "mul");
@@ -223,7 +227,7 @@ public:
 
             auto Edep = o.energy(j);
 
-            hit.fseg = short(NAN);
+            hit.fseg = short(o.segment(j)); //there are two front IDs
             hit.bseg = short(NAN);
 
             auto origin = target.getCenter();
@@ -263,7 +267,11 @@ public:
         for (size_t i = 0; i < mult; i++) {
             auto h = hits[i];
 
-            v_pos->add(h.position);
+            auto posi = h.position;
+            v_pos->add(posi);
+            v_posX->add(posi.X());
+            v_posY->add(posi.Y());
+            v_posZ->add(posi.Z());
             v_dir->add(h.direction);
             v_theta->add(h.theta * TMath::RadToDeg());
 
@@ -298,7 +306,7 @@ public:
         AUSA::clear(
                 *v_dir, *v_pos, *v_Edep, *v_Ea, *v_Et, *v_BE,
                 *v_FE, *v_theta, *v_dE, *v_Ecm, *v_i, *v_F, *v_B,
-                *v_ang, *v_FT, *v_BT
+                *v_ang, *v_FT, *v_BT, *v_posX, *v_posY, *v_posZ
         );
     }
 
@@ -317,6 +325,7 @@ public:
     TTree *t;
     unique_ptr<DynamicBranchVector<TVector3>> v_dir, v_pos;
     unique_ptr<DynamicBranchVector<double>> v_Edep;
+    unique_ptr<DynamicBranchVector<double>> v_posX, v_posY, v_posZ;
     unique_ptr<DynamicBranchVector<double>> v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;;
     unique_ptr<DynamicBranchVector<short>> v_i, v_F, v_B;
     unique_ptr<DynamicBranchVector<double>> v_ang;

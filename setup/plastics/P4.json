@@ -1,5 +1,6 @@
 {
-  "type" : "Pad",
+  "type" : "SquareSSSD",
+  "nSegments" : 2,
   "thickness" : "500um",
   "deadLayer": "0.6um",
   "upLength" : "50mm",

@@ -7,13 +7,18 @@
 #include <TTree.h>
 #include <TVector3.h>
 #include <TClonesArray.h>
+#include <ausa/util/DynamicBranchVector.h>
+#include "projectutil.h"
 
 using namespace std;
 using namespace ROOT;
+using namespace AUSA;
+//using namespace libconfig;
 
 //void FindingCoincidentialHits() {
-void BetaCoincidenceAnalysis() {
-    string filePath = "output/Run167mlio.root";
+//void BetaCoincidenceAnalysis() {
+int main() {
+    string filePath = EUtil::getProjectRoot() + "/output/Run167mlio.root";
 
     auto *f = new TFile(filePath.c_str());
     auto *a = (TTree *) f->Get("a");
@@ -37,11 +42,21 @@ void BetaCoincidenceAnalysis() {
     //a->SetBranchAddress("pos", pos);
     a->SetBranchAddress("Edep", Edep);
 
-    int instancesLeft = 0;
+    int instancesLeft;
     int totalInstances = 0;
     double sumAng = 0;
 
-    auto entries = a->GetEntries();
+    string fileName = "90DegDets_10Deg.root";
+    auto out = new TFile((EUtil::getProjectRoot() + "/output/betaAnalysis/" + fileName).c_str(), "RECREATE");
+    auto tree = new TTree("a", "a");
+
+    tree->Branch("mul", &instancesLeft);
+    auto Ea = make_unique<DynamicBranchVector<double>>(*tree, "Ea", "mul");
+
+
+    auto entries = 100000;//a->GetEntries();
+
+    instancesLeft = 0;
 
     for (int ei = 0; ei < entries; ei++) {
         //cout << "Entry number is " << ei << endl;
@@ -63,16 +78,10 @@ void BetaCoincidenceAnalysis() {
                     auto id2 = id[k];
 
                     //we want two of the instances in the same detector, and one in a pad
-
-
                     bool crit1 = !(id0 < 4 && id0 == id1 && abs(FT0 - FT1) < 1500 && id2 > 3);
                     bool crit2 = !(id0 < 4 && id0 == id2 && abs(FT0 - FT2) < 1500 && id1 > 3);
                     bool crit3 = !(id1 < 4 && id1 == id2 && abs(FT1 - FT2) < 1500 && id0 > 3);
-                    /*
-                    bool crit1 = !(id0 == id1);
-                    bool crit2 = !(id0 == id2);
-                    bool crit3 = !(id1 == id2);
-                    */
+
 
 
                     if (crit1 && crit2 && crit3) continue;
@@ -103,7 +112,7 @@ void BetaCoincidenceAnalysis() {
                     auto ang = posa.Angle(posb)*TMath::RadToDeg();
                     if(ang > 10) continue; //we only want hits at 10 degrees or less.
 
-                    sumAng += ang;
+                    Ea->add(Edepa);
 
                     instancesLeft++;
                 }
@@ -111,7 +120,9 @@ void BetaCoincidenceAnalysis() {
         }
     }
 
+    tree->Write();
+    out->Close();
 
     cout << "There are " << instancesLeft << " valid coincidences left out of " << totalInstances << " possible coincidences" << endl;
-    cout << "Mean angle of the coincidences left was " << sumAng/instancesLeft << " degrees" << endl;
+    return 0;
 }

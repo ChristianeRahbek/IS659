@@ -8,9 +8,13 @@
 #include <TTree.h>
 #include <TVector3.h>
 #include <TClonesArray.h>
+#include <ausa/util/DynamicBranchVector.h>
+#include <TGraph.h>
+#include <TCanvas.h>
 
 using namespace std;
 using namespace ROOT;
+using namespace AUSA;
 
 void proofOfConcept() {
     string filePath = "output/Run167mlio.root";
@@ -25,6 +29,7 @@ void proofOfConcept() {
     Double_t FT[max_hits], Edep[max_hits], posX[max_hits], posY[max_hits], posZ[max_hits];
     //TVector3 pos[max_hits];
     TClonesArray pos("TVector3", max_hits);
+
 
 
     a->SetBranchAddress("num", &num);
@@ -42,6 +47,15 @@ void proofOfConcept() {
     double sumAng = 0;
 
     auto entries = a->GetEntries();
+
+    TGraph *testPlot = new TGraph();
+/*
+    auto tree = new TTree("tree", "tree");
+
+    tree->Branch("mul", &instancesLeft);
+    auto Edep0 = make_unique<DynamicBranchVector<double>>(*tree, "Edep0", "mul");
+    auto Edep1 = make_unique<DynamicBranchVector<double>>(*tree, "Edep1", "mul");
+*/
 
     for (int ei = 0; ei < entries; ei++) {
         //cout << "Entry number is " << ei << endl;
@@ -78,11 +92,16 @@ void proofOfConcept() {
                 if(ang > 10) continue; //we only want hits at 10 degrees or less.
 
                 sumAng += ang;
-
                 instancesLeft++;
+
+                testPlot->SetPoint(instancesLeft, Edepa, Edepb);
             }
         }
     }
+
+    TCanvas *c1 = new TCanvas();
+
+    testPlot->Draw();
 
 
     cout << "There are " << instancesLeft << " valid coincidences left out of " << totalInstances << " possible coincidences" << endl;

@@ -16,8 +16,7 @@ using namespace AUSA;
 //using namespace libconfig;
 
 //void FindingCoincidentialHits() {
-//void BetaCoincidenceAnalysis() {
-int main() {
+void BetaCoincidenceAnalysis() {
     string filePath = EUtil::getProjectRoot() + "/output/Run167mlio.root";
 
     auto *f = new TFile(filePath.c_str());
@@ -42,36 +41,40 @@ int main() {
     //a->SetBranchAddress("pos", pos);
     a->SetBranchAddress("Edep", Edep);
 
-    int instancesLeft;
+    int instancesLeft = 0;
     int totalInstances = 0;
+    int multi; //multiplicity variable in the tree
     double sumAng = 0;
 
+    // Defing Ttree and branches for the output tree
     string fileName = "90DegDets_10Deg.root";
     auto out = new TFile((EUtil::getProjectRoot() + "/output/betaAnalysis/" + fileName).c_str(), "RECREATE");
     auto tree = new TTree("a", "a");
 
-    tree->Branch("mul", &instancesLeft);
+    tree->Branch("mul", &multi);
     auto Ea = make_unique<DynamicBranchVector<double>>(*tree, "Ea", "mul");
+    auto Eb = make_unique<DynamicBranchVector<double>>(*tree, "Eb", "mul");
 
-
-    auto entries = 100000;//a->GetEntries();
-
-    instancesLeft = 0;
+    auto entries = a->GetEntries();
 
     for (int ei = 0; ei < entries; ei++) {
         //cout << "Entry number is " << ei << endl;
+
         a->GetEntry(ei);
         if (mul < 3) continue; //we need at least three hits to have a coincidences with plastics as well
 
-        for (int i = 0; i < mul; i++) { //looping through every instance in an entry
+        for (int i = 0; i < 2; i++) { //looping through every instance in an entry
             auto FT0 = FT[i];
             auto id0 = id[i];
 
-            for (int j = i + 1; j < mul; j++) {
+            for (int j = i + 1; j < 2; j++) {
                 auto FT1 = FT[j];
                 auto id1 = id[j];
 
                 for (int k = j + 1; k < mul; k++) {
+                    multi = 0;
+                    AUSA::clear(*Ea);
+
                     totalInstances++;
                     //cout << "ijk = " << i << j << k << endl;
                     auto FT2 = FT[k];
@@ -112,8 +115,11 @@ int main() {
                     auto ang = posa.Angle(posb)*TMath::RadToDeg();
                     if(ang > 10) continue; //we only want hits at 10 degrees or less.
 
+                    multi++;
                     Ea->add(Edepa);
+                    Eb->add(Edepb);
 
+                    tree->Fill();
                     instancesLeft++;
                 }
             }
@@ -124,5 +130,10 @@ int main() {
     out->Close();
 
     cout << "There are " << instancesLeft << " valid coincidences left out of " << totalInstances << " possible coincidences" << endl;
-    return 0;
+}
+
+int main() {
+    BetaCoincidenceAnalysis();
+
+    return EXIT_SUCCESS;
 }

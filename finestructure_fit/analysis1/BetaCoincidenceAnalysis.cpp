@@ -16,124 +16,157 @@ using namespace AUSA;
 //using namespace libconfig;
 
 //void FindingCoincidentialHits() {
-void BetaCoincidenceAnalysis() {
-    string filePath = EUtil::getProjectRoot() + "/output/Run167mlio.root";
 
-    auto *f = new TFile(filePath.c_str());
-    auto *a = (TTree *) f->Get("a");
+class BetaCoincidenceAnalysis {
+public:
+    BetaCoincidenceAnalysis() {
+        string filePath = EUtil::getProjectRoot() + "/output/Run167mlio.root";
 
-    UInt_t max_hits = 20;
-    Int_t num;
-    UInt_t mul, TPROTONS;
-    UShort_t id[max_hits];
-    Double_t FT[max_hits], Edep[max_hits], posX[max_hits], posY[max_hits], posZ[max_hits];
-    //TVector3 pos[max_hits];
-    TClonesArray pos("TVector3", max_hits);
+        hasBeta = false;
 
+        auto *f = new TFile(filePath.c_str());
+        a = (TTree *) f->Get("a");
 
-    a->SetBranchAddress("num", &num);
-    a->SetBranchAddress("id", &id);
-    a->SetBranchAddress("mul", &mul);
-    a->SetBranchAddress("FT", FT);
-    a->SetBranchAddress("posX", posX);
-    a->SetBranchAddress("posY", posY);
-    a->SetBranchAddress("posY", posY);
-    //a->SetBranchAddress("pos", pos);
-    a->SetBranchAddress("Edep", Edep);
+        a->SetBranchAddress("num", &num);
+        a->SetBranchAddress("id", &id);
+        a->SetBranchAddress("mul", &mul);
+        a->SetBranchAddress("FT", FT);
+        a->SetBranchAddress("posX", posX);
+        a->SetBranchAddress("posY", posY);
+        a->SetBranchAddress("posY", posY);
+        //a->SetBranchAddress("pos", pos);
+        a->SetBranchAddress("Edep", Edep);
 
-    int instancesLeft = 0;
-    int totalInstances = 0;
-    int multi; //multiplicity variable in the tree
-    double sumAng = 0;
+        instancesLeft = 0;
+        totalInstances = 0;
 
-    // Defing Ttree and branches for the output tree
-    string fileName = "90DegDets_10Deg.root";
-    auto out = new TFile((EUtil::getProjectRoot() + "/output/betaAnalysis/" + fileName).c_str(), "RECREATE");
-    auto tree = new TTree("a", "a");
+        // Defing Ttree and branches for the output tree
+        string fileName = "90DegDets_10Deg.root";
+        out = new TFile((EUtil::getProjectRoot() + "/output/betaAnalysis/" + fileName).c_str(), "RECREATE");
+        tree = new TTree("a", "a");
 
-    tree->Branch("mul", &multi);
-    auto Ea = make_unique<DynamicBranchVector<double>>(*tree, "Ea", "mul");
-    auto Eb = make_unique<DynamicBranchVector<double>>(*tree, "Eb", "mul");
+        tree->Branch("mul", &multi);
+        tree->Branch("hasBeta", &hasBeta);
+        Ea = make_unique<DynamicBranchVector<double>>(*tree, "Ea", "mul");
+        Eb = make_unique<DynamicBranchVector<double>>(*tree, "Eb", "mul");
+        EPlastic = make_unique<DynamicBranchVector<double>>(*tree, "EPlastic", "mul");
+        timeA = make_unique<DynamicBranchVector<double>>(*tree, "timeA", "mul");
+        timeB = make_unique<DynamicBranchVector<double>>(*tree, "timeB", "mul");
+        timeC = make_unique<DynamicBranchVector<double>>(*tree, "timeB", "mul");
+        //betaBool = make_unique<DynamicBranchVector<Bool_t>>(*tree, "hasBeta", "mul");
 
-    auto entries = a->GetEntries();
+        entries = a->GetEntries();
 
-    for (int ei = 0; ei < entries; ei++) {
-        //cout << "Entry number is " << ei << endl;
+    }
 
-        a->GetEntry(ei);
-        if (mul < 3) continue; //we need at least three hits to have a coincidences with plastics as well
+    void Analyze() {
+        for (int ei = 0; ei < entries; ei++) {
+            //cout << "Entry number is " << ei << endl;
 
-        for (int i = 0; i < 2; i++) { //looping through every instance in an entry
-            auto FT0 = FT[i];
-            auto id0 = id[i];
+            a->GetEntry(ei);
+            if (mul < 3) continue; //we need at least three hits to have a coincidences with plastics as well
 
-            for (int j = i + 1; j < 2; j++) {
-                auto FT1 = FT[j];
-                auto id1 = id[j];
+            for (int i = 0; i < mul; i++) { //looping through every instance in an entry
+                auto FT0 = FT[i];
+                auto id0 = id[i];
 
-                for (int k = j + 1; k < mul; k++) {
-                    multi = 0;
-                    AUSA::clear(*Ea);
+                for (int j = i + 1; j < mul; j++) {
+                    auto FT1 = FT[j];
+                    auto id1 = id[j];
 
-                    totalInstances++;
-                    //cout << "ijk = " << i << j << k << endl;
-                    auto FT2 = FT[k];
-                    auto id2 = id[k];
+                    for (int k = j + 1; k < mul; k++) {
+                        multi = 0;
+                        hasBeta = false;
+                        AUSA::clear(*Ea, *Eb, *EPlastic,*timeA, *timeB, *timeC);
 
-                    //we want two of the instances in the same detector, and one in a pad
-                    bool crit1 = !(id0 < 4 && id0 == id1 && abs(FT0 - FT1) < 1500 && id2 > 3);
-                    bool crit2 = !(id0 < 4 && id0 == id2 && abs(FT0 - FT2) < 1500 && id1 > 3);
-                    bool crit3 = !(id1 < 4 && id1 == id2 && abs(FT1 - FT2) < 1500 && id0 > 3);
+                        totalInstances++;
+                        //cout << "ijk = " << i << j << k << endl;
+                        auto FT2 = FT[k];
+                        auto id2 = id[k];
 
+                        if(FT0 > 3e9 || FT1 > 3e9 || FT2 > 3e9) continue;
+                        //we want two of the instances in the same detector, and one in a pad
+                        bool crit1 = !(id0 < 4 && id0 == id1 && abs(FT0 - FT1) < 1500 && id2 > 3);
+                        bool crit2 = !(id0 < 4 && id0 == id2 && abs(FT0 - FT2) < 1500 && id1 > 3);
+                        bool crit3 = !(id1 < 4 && id1 == id2 && abs(FT1 - FT2) < 1500 && id0 > 3);
 
+                        if (crit1 && crit2 && crit3) hasBeta = true;
+                        //now making sure we at least have two coincidences in the same DSSD
+                        else if (!((id0 < 4 && id0 == id1) || (id0 < 4 && id0 == id2) || (id1 < 4 && id1 == id2))) continue;
+                        totalInstances++;
 
-                    if (crit1 && crit2 && crit3) continue;
+                        if(id0==id1) {
+                            SetValues(i,j,k);
+                        }
+                        else if(id0==id2) {
+                            SetValues(i,k,j);
+                        }
+                        else {
+                            SetValues(k,j, i);
+                        }
 
-                    TVector3 posa, posb;
-                    double_t Edepa, Edepb;
-                    if(id0==id1) {
-                        Edepa = Edep[i];
-                        Edepb = Edep[j];
-                        posa = TVector3(posX[i], posY[i], posZ[i]);
-                        posb = TVector3(posX[j], posY[j], posZ[j]);
+                        if(Edepa >= 800 && Edepb >= 800) continue; //energies of less than 800 keV in one of the detectors is needed
+
+                        auto ang = posa.Angle(posb)*TMath::RadToDeg();
+                        if(ang > 10) continue; //we only want hits at 10 degrees or less.
+                        //if(abs(tA-tC)>1500 || abs(tB-tC)>1500) continue; // only want coincidential hits...
+
+                        Ea->add(Edepa);
+                        Eb->add(Edepb);
+                        EPlastic->add(EdepPlastic);
+                        timeA->add(tA);
+                        timeB->add(tB);
+                        timeC->add(tC);
+
+                        multi++;
+                        tree->Fill();
+                        instancesLeft++;
                     }
-                    else if(id0==id2) {
-                        Edepa = Edep[i];
-                        Edepb = Edep[k];
-                        posa = TVector3(posX[i], posY[i], posZ[i]);
-                        posb = TVector3(posX[k], posY[k], posZ[k]);
-                    }
-                    else {
-                        Edepa = Edep[k];
-                        Edepb = Edep[j];
-                        posa = TVector3(posX[k], posY[k], posZ[k]);
-                        posb = TVector3(posX[j], posY[j], posZ[j]);
-                    }
-
-                    if(Edepa >= 800 && Edepb >= 800) continue; //energies of less than 800 keV in one of the detectors is needed
-
-                    auto ang = posa.Angle(posb)*TMath::RadToDeg();
-                    if(ang > 10) continue; //we only want hits at 10 degrees or less.
-
-                    multi++;
-                    Ea->add(Edepa);
-                    Eb->add(Edepb);
-
-                    tree->Fill();
-                    instancesLeft++;
                 }
             }
         }
+
+        tree->Write();
+        out->Close();
+
+        cout << "There are " << instancesLeft << " valid coincidences left out of " << totalInstances << " possible coincidences" << endl;
+
     }
 
-    tree->Write();
-    out->Close();
+    void SetValues(int i, int j, int k) {
+        Edepa = Edep[i];
+        Edepb = Edep[j];
+        EdepPlastic = NAN;
+        posa = TVector3(posX[i], posY[i], posZ[i]);
+        posb = TVector3(posX[j], posY[j], posZ[j]);
+        tA = FT[i];
+        tB = FT[j];
+        tC = FT[k];
 
-    cout << "There are " << instancesLeft << " valid coincidences left out of " << totalInstances << " possible coincidences" << endl;
-}
+    }
+
+    UInt_t mul, TPROTONS;
+    Int_t num;
+    UShort_t id[20];
+    Double_t FT[20], Edep[20], posX[20], posY[20], posZ[20];
+
+    unique_ptr<DynamicBranchVector<double>> Ea, Eb, EPlastic, timeA, timeB, timeC;
+    //unique_ptr<DynamicBranchVector<Bool_t>> betaBool;
+    TFile *out;
+    TTree *a, *tree;
+    int instancesLeft, totalInstances, multi; //multi is multiplicity variable in the output tree
+
+    TVector3 posa, posb;
+    double_t Edepa, Edepb, EdepPlastic, tA, tB, tC;
+    Bool_t hasBeta;
+
+    Long64_t entries;
+};
 
 int main() {
-    BetaCoincidenceAnalysis();
+    auto analysis = new BetaCoincidenceAnalysis();
+
+    analysis->Analyze();
 
     return EXIT_SUCCESS;
 }

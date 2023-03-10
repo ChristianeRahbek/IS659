@@ -701,12 +701,12 @@ void prepareFileIO(const string &configfile) {
         setup_path = EUtil::getProjectRoot() + "/" + cfg.lookup("setup_file").c_str();
         target_path = EUtil::getProjectRoot() + "/" + cfg.lookup("target_file").c_str();
         input_path = EUtil::getProjectRoot() + "/" + cfg.lookup("data_input").c_str();
-        output_dir = EUtil::getProjectRoot() + "/" + cfg.lookup("data_output_dir").c_str();
+        output_dir = EUtil::getProjectRoot() + "/" + cfg.lookup("data_output_dir_3coincidence").c_str();
     } else {
         setup_path = cfg.lookup("setup_file").c_str();
         target_path = cfg.lookup("target_file").c_str();
         input_path = cfg.lookup("data_input").c_str();
-        output_dir = cfg.lookup("data_output_dir").c_str();
+        output_dir = cfg.lookup("data_output_dir_3coincidence ").c_str();
     }
 
     if (cfg.lookup("verbose")) {

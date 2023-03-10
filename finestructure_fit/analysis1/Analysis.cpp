@@ -1,3 +1,8 @@
+/** Updated by Christiane Rahbek.
+ *  This Analysis finds 2 coincidential instances in the DSSDs.
+ *  No other detectors such as Plastics and Clovers are considered.
+**/
+
 #include <iostream>
 #include <string>
 #include <ausa/json/IO.h>
@@ -125,7 +130,7 @@ public:
 
 
   void findHits() {
-    for (size_t i = 0; i < output.dssdCount(); i++) {
+    for (size_t i = 0; i < output.dssdCount(); i++) { //only looking at DSSDs
       auto &o = output.getDssdOutput(i);
       auto &p = output.getSingleOutput(i);
       auto &d = o.detector();

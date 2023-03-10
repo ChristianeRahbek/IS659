@@ -13,10 +13,10 @@ using namespace std;
 
 void KolmogorovTest(){
     string filePath = "../../TPROTONS_id8_980.root";
-    string myFilePath = "output/2coincidence/Run121mlio.root";
-    int noOfBins = 7000;
+    string myFilePath = "output/2coincidence/Run120mlio.root";
+    int noOfBins = 1000;//7000;
     double xlow = 0;
-    double xup = 3500;
+    double xup = 500;//3500;
 
     auto canv = new TCanvas();
     canv->cd();
@@ -26,10 +26,12 @@ void KolmogorovTest(){
 
     auto madsHist = new TH1F("madshist", "madshist", noOfBins, xlow, xup);
 
+    int madsEntries = 0;
     for(UInt_t i = 1; i <= hist->GetEntries(); i++) { //cut histogram to only the usable part
         if(hist->GetXaxis()->GetBinCenter(i) < xup) {
             auto data = hist->GetBinContent(i);
             madsHist->SetBinContent(i, hist->GetBinContent(i));
+            madsEntries+=hist->GetBinContent(i);
         }
     }
 
@@ -39,8 +41,8 @@ void KolmogorovTest(){
     auto *myTree=(TTree*)myfile->Get("a");
 
     auto myHist = new TH1F("myhist", "myhist", noOfBins, xlow, xup);
-    myTree->Draw("TPROTONS >> myhist", "id0==id1 && abs(FT0-FT1)<1500 && (Edep0<800 || Edep1<800)", "same");
-    //myTree->Draw("TPROTONS >> myhist", "((id0==0 && id1==2) || (id0==1 && id1==3) ||(id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng<130 && abs(Edep0-Edep1)>500", "same");
+    //myTree->Draw("TPROTONS >> myhist", "id0==id1 && abs(FT0-FT1)<1500 && (Edep0<800 || Edep1<800)", "same");
+    myTree->Draw("TPROTONS >> myhist", "((id0==0 && id1==2) || (id0==1 && id1==3) ||(id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng<130 && abs(Edep0-Edep1)>500", "same");
 /*
     auto pValLowAngle = madsHist->KolmogorovTest(myHist);
 
@@ -75,7 +77,8 @@ void KolmogorovTest(){
     }
     */
 
-    ROOT::Math::GoFTest* testLowAng = new ROOT::Math::GoFTest(madsHist->GetEntries(), sampleMads, myHist->GetEntries(), sampleLowAng);
+    ROOT::Math::GoFTest* testLowAng = new ROOT::Math::GoFTest(madsEntries, sampleMads, myHist->GetEntries(), sampleLowAng);
+    //ROOT::Math::GoFTest* testLowAng = new ROOT::Math::GoFTest(madsHist->GetEntries(), sampleMads, myHist->GetEntries(), sampleLowAng);
     //ROOT::Math::GoFTest* testBigAng = new ROOT::Math::GoFTest(madsHist->GetEntries(), sampleMads, myHistAltnative->GetEntries(), sampleBigAng);
 
     auto pValLow = testLowAng->KolmogorovSmirnov2SamplesTest();

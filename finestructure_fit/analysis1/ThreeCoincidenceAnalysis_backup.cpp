@@ -290,6 +290,7 @@ public:
 
     void doAnalysis() {
         auto mult = hits.size();
+        cout << "multiplicity is " << mult << endl;
 
         //if(hits.empty()) return;
         if (mult < 2) return;
@@ -367,7 +368,7 @@ public:
                     auto h_j = hits[j];
 
                     for(size_t k = j + 1; k < mult; k++) {
-                        auto h_k = hits[k];
+                        auto h_k = hits[j];
                         auto id_i = h_i.index;
                         auto id_j = h_j.index;
                         auto id_k = h_k.index;
@@ -468,6 +469,7 @@ public:
                         v_hitAng->add(hitAngle);
 
                         mul++;
+
                     }
                 }
             }

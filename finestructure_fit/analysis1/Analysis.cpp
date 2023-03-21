@@ -248,7 +248,8 @@ public:
           auto p0a = TVector3(pl0a.Px(), pl0a.Py(), pl0a.Pz());
           auto p0t = TVector3(pl0t.Px(), pl0t.Py(), pl0t.Pz());
 
-          for(size_t j = i+1; i <mult; i++) {
+          for(size_t j = i+1; j < mult; j++) {
+              //cout << "i, j: " << i << ", " << j << endl;
               auto h1 = hits[j];
 
               auto pl1a = h1.lVector_alpha;

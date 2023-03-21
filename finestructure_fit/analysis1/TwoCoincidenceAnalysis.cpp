@@ -286,7 +286,7 @@ public:
 
             if (h0.index > 3) continue; //we only want coincidences with DSSDs
 
-            for (size_t j = i + 1; i < mult; i++) {
+            for (size_t j = i + 1; j < mult; j++) {
                 auto h1 = hits[j];
 
                 if (h1.index > 3) continue; //we only want coincidences with DSSDs

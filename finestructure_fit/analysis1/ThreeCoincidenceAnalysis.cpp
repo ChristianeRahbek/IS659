@@ -45,7 +45,10 @@ public:
 
         t = new TTree("a", "a");
         t->Branch("mul", &mul);
+        t->Branch("mulOrig", &mulOrig);
         t->Branch("num", &NUM);
+        t->Branch("dssdMul", &dssdMul);
+        t->Branch("plasticMul", &plasticMul);
 
         v_dir0 = make_unique<DynamicBranchVector<TVector3>>(*t, "dir0");
         v_pos0 = make_unique<DynamicBranchVector<TVector3>>(*t, "pos0");
@@ -53,6 +56,8 @@ public:
         v_pos1 = make_unique<DynamicBranchVector<TVector3>>(*t, "pos1");
         v_dir2 = make_unique<DynamicBranchVector<TVector3>>(*t, "dir2");
         v_pos2 = make_unique<DynamicBranchVector<TVector3>>(*t, "pos2");
+
+        v_matchPlas = make_unique<DynamicBranchVector<int>>(*t, "matchPlas", "mul");
 
         v_theta0 = make_unique<DynamicBranchVector<double>>(*t, "theta0", "mul");
         v_ang0 = make_unique<DynamicBranchVector<double>>(*t, "angle0", "mul");
@@ -291,16 +296,25 @@ public:
     void doAnalysis() {
         auto mult = hits.size();
 
+        mulOrig = mult;
+
         //if(hits.empty()) return;
         if (mult < 2) return;
         else if(mult == 2) {
             for(size_t i = 0; i < mult; i++) {
                 auto h0 = hits[i];
 
+                if(h0.index > 3) continue;
+
+                if(h0.index < 4 && h0.index >= 0) dssdMul++;
+                else plasticMul++;
+
                 for(size_t j = i + 1; j < mult; j++){
+                    hasMatchingPlastic = 0; //0=false
                     auto h1 = hits[j];
 
-                    if(h0.index > 3 || h1.index > 3) break; //only DSSD coincidences
+                    if(h1.index > 3) continue;
+                    //if(h0.index > 3 || h1.index > 3) break; //only DSSD coincidences
 
                     v_pos0->add(h0.position);
                     v_dir0->add(h0.direction);
@@ -363,6 +377,9 @@ public:
             for(size_t i = 0; i < mult; i++) {
                 auto h_i = hits[i];
 
+                if(h_i.index < 4 && h_i.index >= 0) dssdMul++;
+                else plasticMul++;
+
                 for(size_t j = i + 1; j < mult; j++) {
                     auto h_j = hits[j];
 
@@ -372,14 +389,9 @@ public:
                         auto id_j = h_j.index;
                         auto id_k = h_k.index;
 
+                        //we want at least 2 DSSD coincidences
                         if(!((id_i < 4 && (id_j < 4 || id_k < 4)) || (id_j < 4 && (id_i < 4 || id_k < 4)) ||
                           (id_k < 4 && (id_j < 4 || id_i < 4)))) continue;
-
-                        //FROM HERE: HOW To sort them? Should I remove all coincidences with 3 DSSD matches? Then It would be easier...
-                        //Lav sortering, som siger, at vi kun vil have Plastics som tilhører de fundne DSSD'er.
-
-                        //I now choose to remove all coincidences with 3 DSSD matches
-                        if(id_i < 4 && id_j < 4 && id_k < 4) continue;
 
                         Hit h0, h1, h2;
                         if(id_i > 3) {
@@ -397,12 +409,44 @@ public:
                             h1 = h_j;
                             h2 = h_k;
                         }
+                        else { //if we have 3 DSSDs we set h2 to have the lowest energy
+                            auto Ei = h_i.Edep;
+                            auto Ej = h_j.Edep;
+                            auto Ek = h_k.Edep;
+                            if(Ei < Ej) {
+                                if(Ei < Ek) {
+                                    h0 = h_j;
+                                    h1 = h_k;
+                                    h2 = h_i;
+                                }
+                                else {
+                                    h0 = h_j;
+                                    h1 = h_i;
+                                    h2 = h_k;
+                                }
+                            }
+                            else{
+                                if(Ej < Ek) {
+                                    h0 = h_i;
+                                    h1 = h_k;
+                                    h2 = h_j;
+                                }
+                                else {
+                                    h0 = h_i;
+                                    h1 = h_j;
+                                    h2 = h_k;
+                                }
+                            }
+                        }
 
                         //we only want coincidences from same plastics as DSSD hits.
-                        //be aware that we can throw away some perfectly fine coincidences from this...
+                        //if a plastic is in coincidence with the DSSD in front of it, it is potentially a beta
                         auto id0 = h0.index; auto id1 = h1.index; auto id2 = h2.index;
                         if(!(((id0==0 || id1==0) && id2 == 4) || ((id0==1 || id1==1) && id2 == 5) ||
-                           ((id0==2 || id1==2) && id2 == 6) || ((id0==3 || id1==3) && id2 == 7))) continue;
+                           ((id0==2 || id1==2) && id2 == 6) || ((id0==3 || id1==3) && id2 == 7))) {
+                            hasMatchingPlastic = 0; //0=false
+                        }
+                        else hasMatchingPlastic = 1;
 
                         v_pos0->add(h0.position);
                         v_dir0->add(h0.direction);
@@ -452,6 +496,7 @@ public:
                         v_B2->add(h2.bseg);
                         v_FT2->add(h2.TF);
                         v_BT2->add(h2.TB);
+                        v_matchPlas->add(hasMatchingPlastic);
 
                         double hitAngle;
                         if (h0.index < 4 && h1.index < 4) {
@@ -468,157 +513,11 @@ public:
                         v_hitAng->add(hitAngle);
 
                         mul++;
+
                     }
                 }
             }
-
         }
-
-        /*
-        for (size_t i = 0; i < mult; i++) {
-            auto h0 = hits[i];
-
-            for (size_t j = i + 1; i < mult; i++) {
-                auto h1 = hits[j];
-
-                //
-                //removing ability to look at 2 coincidences
-                //
-                if (mult < 3) {
-                    v_pos0->add(h0.position);
-                    v_dir0->add(h0.direction);
-                    v_theta0->add(h0.theta * TMath::RadToDeg());
-                    v_pos1->add(h1.position);
-                    v_dir1->add(h1.direction);
-                    v_theta1->add(h1.theta * TMath::RadToDeg());
-                    v_pos2->add(NAN_TVECTOR3);
-                    v_dir2->add(NAN_TVECTOR3);
-                    v_theta2->add(NAN);
-
-                    v_Ea0->add(h0.Ea);
-                    v_Et0->add(h0.Et);
-                    v_Edep0->add(h0.Edep);
-                    v_BE0->add(h0.BE);
-                    v_FE0->add(h0.FE);
-                    v_Ea1->add(h1.Ea);
-                    v_Et1->add(h1.Et);
-                    v_Edep1->add(h1.Edep);
-                    v_BE1->add(h1.BE);
-                    v_FE1->add(h1.FE);
-                    v_Ea2->add(NAN);
-                    v_Et2->add(NAN);
-                    v_Edep2->add(NAN);
-                    v_BE2->add(NAN);
-                    v_FE2->add(NAN);
-
-                    v_dE0->add(h0.dE);
-                    v_dE1->add(h1.dE);
-                    v_dE2->add(NAN);
-                    v_ang0->add(h0.angle * TMath::RadToDeg());
-                    v_ang1->add(h1.angle * TMath::RadToDeg());
-                    v_ang2->add(NAN);
-
-                    v_i0->add(static_cast<short>(h0.index));
-                    v_F0->add(h0.fseg);
-                    v_B0->add(h0.bseg);
-                    v_FT0->add(h0.TF);
-                    v_BT0->add(h0.TB);
-                    v_i1->add(static_cast<short>(h1.index));
-                    v_F1->add(h1.fseg);
-                    v_B1->add(h1.bseg);
-                    v_FT1->add(h1.TF);
-                    v_BT1->add(h1.TB);
-                    v_i2->add(static_cast<short>(-1));
-                    v_F2->add(static_cast<short>(-1));
-                    v_B2->add(static_cast<short>(-1));
-                    v_FT2->add(NAN);
-                    v_BT2->add(NAN);
-
-                    double hitAngle;
-                    if (h0.index < 4 && h1.index < 4) {
-                        hitAngle = h1.position.Angle(h0.position) * TMath::RadToDeg();
-                    }
-                    else hitAngle = NAN;
-
-                    v_hitAng->add(hitAngle);
-
-                    mul++;
-                }
-
-                for (size_t k = j + 1; k < mult; k++) {
-                    auto h2 = hits[k];
-
-                    if(abs(h0.TF-h1.TF)>1500 || abs(h2.TF-h1.TF)>1500 || abs(h0.TF-h2.TF)>1500) continue;
-
-                    v_pos0->add(h0.position);
-                    v_dir0->add(h0.direction);
-                    v_theta0->add(h0.theta * TMath::RadToDeg());
-                    v_pos1->add(h1.position);
-                    v_dir1->add(h1.direction);
-                    v_theta1->add(h1.theta * TMath::RadToDeg());
-                    v_pos2->add(h2.position);
-                    v_dir2->add(h2.direction);
-                    v_theta2->add(h2.theta * TMath::RadToDeg());
-
-
-                    v_Ea0->add(h0.Ea);
-                    v_Et0->add(h0.Et);
-                    v_Edep0->add(h0.Edep);
-                    v_BE0->add(h0.BE);
-                    v_FE0->add(h0.FE);
-                    v_Ea1->add(h1.Ea);
-                    v_Et1->add(h1.Et);
-                    v_Edep1->add(h1.Edep);
-                    v_BE1->add(h1.BE);
-                    v_FE1->add(h1.FE);
-                    v_Ea2->add(h2.Ea);
-                    v_Et2->add(h2.Et);
-                    v_Edep2->add(h2.Edep);
-                    v_BE2->add(h2.BE);
-                    v_FE2->add(h2.FE);
-
-                    v_dE0->add(h0.dE);
-                    v_dE1->add(h1.dE);
-                    v_dE2->add(h2.dE);
-                    v_ang0->add(h0.angle * TMath::RadToDeg());
-                    v_ang1->add(h1.angle * TMath::RadToDeg());
-                    v_ang2->add(h2.angle * TMath::RadToDeg());
-
-                    v_i0->add(static_cast<short>(h0.index));
-                    v_F0->add(h0.fseg);
-                    v_B0->add(h0.bseg);
-                    v_FT0->add(h0.TF);
-                    v_BT0->add(h0.TB);
-                    v_i1->add(static_cast<short>(h1.index));
-                    v_F1->add(h1.fseg);
-                    v_B1->add(h1.bseg);
-                    v_FT1->add(h1.TF);
-                    v_BT1->add(h1.TB);
-                    v_i2->add(static_cast<short>(h2.index));
-                    v_F2->add(h2.fseg);
-                    v_B2->add(h2.bseg);
-                    v_FT2->add(h2.TF);
-                    v_BT2->add(h2.TB);
-
-                    double hitAngle;
-                    if (h0.index < 4 && h1.index < 4) {
-                        hitAngle = h1.position.Angle(h0.position) * TMath::RadToDeg();
-                    }
-                    else if (h0.index < 4 && h2.index < 4) {
-                        hitAngle = h2.position.Angle(h0.position) * TMath::RadToDeg();
-                    }
-                    else if (h1.index < 4 && h2.index < 4) {
-                        hitAngle = h2.position.Angle(h1.position) * TMath::RadToDeg();
-                    }
-                    else hitAngle = NAN;
-
-                    v_hitAng->add(hitAngle);
-
-                    mul++;
-                }
-            }
-        }
-        */
     }
 
     void SortByType(Hit h0, Hit h1, Hit h2) {
@@ -641,6 +540,9 @@ public:
 
     void clear() {
         mul = 0;
+        mulOrig = 0;
+        dssdMul = 0;
+        plasticMul = 0;
         AUSA::clear(
                 *v_Et0, *v_Ea0, *v_theta0, *v_Edep0, *v_Et1, *v_Ea1, *v_theta1, *v_Edep1,
                 *v_i0, *v_FE0, *v_BE0, *v_i1, *v_FE1, *v_BE1,
@@ -648,7 +550,7 @@ public:
                 *v_ang0, *v_pos0, *v_dir0, *v_ang1, *v_pos1, *v_dir1,
                 *v_dE0, *v_FT0, *v_BT0, *v_dE1, *v_FT1, *v_BT1, *v_hitAng,
                 *v_dir2, *v_pos2, *v_Edep2, *v_Ea2, *v_Et2, *v_BE2, *v_FE2, *v_theta2, *v_dE2,
-                *v_Ecm2, *v_i2, *v_F2, *v_B2, *v_ang2, *v_FT2, *v_BT2
+                *v_Ecm2, *v_i2, *v_F2, *v_B2, *v_ang2, *v_FT2, *v_BT2, *v_matchPlas
         );
     }
 
@@ -674,19 +576,23 @@ public:
     unique_ptr<DynamicBranchVector<short>> v_F0, v_B0, v_F1, v_B1, v_F2, v_B2;
     unique_ptr<DynamicBranchVector<double>> v_ang0, v_ang1, v_ang2, v_hitAng;
     unique_ptr<DynamicBranchVector<double>> v_FT0, v_BT0, v_FT1, v_BT1, v_FT2, v_BT2;
+    unique_ptr<DynamicBranchVector<int>> v_matchPlas;
 
 
-    UInt_t mul{}, TPROTONS{};
+    UInt_t mul{}, TPROTONS{}, mulOrig{}, dssdMul{}, plasticMul{};
     vector<Hit> hits;
 
     unique_ptr<EnergyLossRangeInverter> aSiCalc, tSiCalc;
     vector<unique_ptr<EnergyLossRangeInverter>> aTargetCalcs, tTargetCalcs;
     vector<double> deadlayerF, deadlayerB, deadlayerP;
+    tuple<Hit, Hit, Hit> savedCoincidentialHits;
+    vector<tuple<Hit, Hit, Hit>> compareHits;
     Target &target;
     ParticleType *TRITON;
     TLorentzVector beamVector;
     double beamEnergy;
     TVector3 cmBoost;
+    int hasMatchingPlastic = 1; //1=true
     bool simulation = false;
 };
 

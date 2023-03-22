@@ -34,11 +34,14 @@ using namespace libconfig;
 
 class SingleDssdAnalysis {
 public:
-    SingleDssdAnalysis(string filePath) {
+    SingleDssdAnalysis(TString outfilename) {
         NUM = 0;
 
-        this->filePath = filePath;
+        //this->filePath = filePath;
 
+        isBeta = 0;
+
+        output = new TFile(outfilename, "RECREATE");
         t = new TTree("a", "a");
         t->Branch("mul", &mul);
         t->Branch("num", &NUM);
@@ -73,7 +76,7 @@ public:
         t->Branch("TPROTONS", &TPROTONS);
     }
 
-    TTree* findSingleDssdHits() {
+    void findSingleDssdHits(string filePath) {
         cout << "making tree" << endl;
         auto *f= new TFile(filePath.c_str());
         auto *tr=(TTree*)f->Get("a");
@@ -107,15 +110,17 @@ public:
         tr->SetBranchAddress("dE", dEOrig);
         tr->SetBranchAddress("Ecm", EcmOrig);
 
+        output->cd();
+
         cout << "looping through entries" << flush << endl;
         for(UInt_t i = 0; i < tr->GetEntries(); i++) { //looping through each entry
             clear();
             tr->GetEntry(i);
 
-            if(!(dssdMulOrig==1)) continue; //this is a single DSSD analysis
+            if(dssdMulOrig != 1) continue; //this is a single DSSD analysis
 
             for(UInt_t j = 0; j < mulOrig; j++) {
-                cout << "i, j = " << i << ", " << j << flush << endl;
+                //cout << "i, j = " << i << ", " << j << flush << endl;
 
                 double tol = 0; //FIX THIS
                 double deltaT = 0; //FIX THIS
@@ -125,28 +130,28 @@ public:
                 }
                 else isBeta = 0; // false
 
-                cout << "adding to tree" << flush << endl;
-                v_theta->add(thetaOrig[i]);
-                v_ang->add(angOrig[i]);
-                cout << "angOrig added" << flush << endl;
-                v_Ea->add(EaOrig[i]);
-                cout << "EaOrig added" << flush << endl;
-                v_Edep->add(EdepOrig[i]);
-                cout << "EdepOrig added" << flush << endl;
-                v_Et->add(EtOrig[i]);
-                v_BE->add(BEOrig[i]);
-                v_FE->add(FEOrig[i]);
-                v_FT->add(FTOrig[i]);
-                v_BT->add(BTOrig[i]);
-                v_dE->add(dEOrig[i]);
-                v_Ecm->add(EcmOrig[i]);
-                v_i->add(idOrig[i]);
+                //cout << "adding to tree" << flush << endl;
+                v_theta->add(thetaOrig[j]);
+                v_ang->add(angOrig[j]);
+                //cout << "angOrig added" << flush << endl;
+                v_Et->add(EtOrig[j]);
+                v_BE->add(BEOrig[j]);
+                v_FE->add(FEOrig[j]);
+                v_FT->add(FTOrig[j]);
+                v_BT->add(BTOrig[j]);
+                v_dE->add(dEOrig[j]);
+                v_Ecm->add(EcmOrig[j]);
+                v_Ea->add(EaOrig[j]);
+                //cout << "EaOrig added" << flush << endl;
+                v_Edep->add(EdepOrig[j]);
+                //cout << "EdepOrig added" << flush << endl;
+                v_i->add(idOrig[j]);
                 v_isBeta->add(isBeta);
-                v_F->add(FIOrig[i]);
-                v_B->add(BIOrig[i]);
+                v_F->add(FIOrig[j]);
+                v_B->add(BIOrig[j]);
 
 
-                cout << "finished adding" << flush << endl;
+                //cout << "finished adding" << flush << endl;
                 TPROTONS = TPROTONSOrig;
                 plasticMul = plasticMulOrig;
                 dssdMul = dssdMulOrig;
@@ -158,9 +163,9 @@ public:
             //cout << "filling tree" << endl;
             t->Fill();
         }
-        cout << "returning tree" << flush << endl;
-        //t->Write();
-        return t;
+        //cout << "returning tree" << flush << endl;
+        t->Write();
+        output->Close();
     }
 
     void clear() {
@@ -197,8 +202,9 @@ public:
     unique_ptr<DynamicBranchVector<double>> v_FT, v_BT;
 
 
+    TFile *output;
     UInt_t mul{}, TPROTONS{}, dssdMul{}, plasticMul{};
-    string filePath;
+    //string filePath;
     int isBeta;
 };
 
@@ -255,13 +261,11 @@ int main(int argc, char *argv[]) {
 
         TFile output(outfile, "RECREATE");
         cout << "starting analysis" << flush <<  endl;
-        auto analysis = new SingleDssdAnalysis(in);
+        auto analysis = new SingleDssdAnalysis(outfile);
         cout << "making out tree" << flush << endl;
-        auto outTree = analysis->findSingleDssdHits();
-        cout << "writing out tree" << flush << endl;
-        outTree->Write();
+        analysis->findSingleDssdHits(in);
         cout << "closing file" << flush << endl;
-        output.Close();
+        //output.Close();
 
         clock_t stop = clock();
         double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;

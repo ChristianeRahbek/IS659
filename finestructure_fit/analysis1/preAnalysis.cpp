@@ -279,7 +279,8 @@ public:
             auto id = hit.index;
 
             if (id < 4) dssdMul++;
-            else plasticMul++;
+            else if (hit.Edep>1) plasticMul++;
+            else continue;
 
             v_pos->add(hit.position);
             v_dir->add(hit.direction);

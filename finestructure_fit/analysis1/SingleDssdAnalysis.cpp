@@ -86,28 +86,28 @@ public:
                     thetaOrig[maxHits], angOrig[maxHits], FTOrig[maxHits], BTOrig[maxHits], dEOrig[maxHits],
                     EcmOrig[maxHits];
 
-        cout << "setting branches in tree" << endl;
+        cout << "setting branches in tree" << flush << endl;
         tr->SetBranchAddress("mul", &mulOrig);
         tr->SetBranchAddress("TPROTONS", &TPROTONSOrig);
         tr->SetBranchAddress("num", &numOrig);
         tr->SetBranchAddress("plasticMul", &plasticMulOrig);
         tr->SetBranchAddress("dssdMul", &dssdMulOrig);
-        tr->SetBranchAddress("id", &idOrig);
-        tr->SetBranchAddress("FI", &FIOrig);
-        tr->SetBranchAddress("BI", &BIOrig);
-        tr->SetBranchAddress("Edep", &EdepOrig);
-        tr->SetBranchAddress("Ea", &EaOrig);
-        tr->SetBranchAddress("Et", &EtOrig);
-        tr->SetBranchAddress("BE", &BEOrig);
-        tr->SetBranchAddress("FE", &FEOrig);
-        tr->SetBranchAddress("theta", &thetaOrig);
-        tr->SetBranchAddress("angle", &angOrig);
-        tr->SetBranchAddress("FT", &FTOrig);
-        tr->SetBranchAddress("BT", &BTOrig);
-        tr->SetBranchAddress("dE", &dEOrig);
-        tr->SetBranchAddress("Ecm", &EcmOrig);
+        tr->SetBranchAddress("id", idOrig);
+        tr->SetBranchAddress("FI", FIOrig);
+        tr->SetBranchAddress("BI", BIOrig);
+        tr->SetBranchAddress("Edep", EdepOrig);
+        tr->SetBranchAddress("Ea", EaOrig);
+        tr->SetBranchAddress("Et", EtOrig);
+        tr->SetBranchAddress("BE", BEOrig);
+        tr->SetBranchAddress("FE", FEOrig);
+        tr->SetBranchAddress("theta", thetaOrig);
+        tr->SetBranchAddress("angle", angOrig);
+        tr->SetBranchAddress("FT", FTOrig);
+        tr->SetBranchAddress("BT", BTOrig);
+        tr->SetBranchAddress("dE", dEOrig);
+        tr->SetBranchAddress("Ecm", EcmOrig);
 
-        cout << "looping through entries" << endl;
+        cout << "looping through entries" << flush << endl;
         for(UInt_t i = 0; i < tr->GetEntries(); i++) { //looping through each entry
             clear();
             tr->GetEntry(i);
@@ -115,22 +115,24 @@ public:
             if(!(dssdMulOrig==1)) continue; //this is a single DSSD analysis
 
             for(UInt_t j = 0; j < mulOrig; j++) {
-                cout << "i, j = " << i << ", " << j << endl;
+                cout << "i, j = " << i << ", " << j << flush << endl;
 
                 double tol = 0; //FIX THIS
                 double deltaT = 0; //FIX THIS
 
-                if(plasticMulOrig > 0 && deltaT < tol) {
+                if(plasticMulOrig > 0 && deltaT < tol) { //should plasticMul>1??
                     isBeta = 1; // true
                 }
                 else isBeta = 0; // false
 
-                cout << "adding to tree" << endl;
+                cout << "adding to tree" << flush << endl;
                 v_theta->add(thetaOrig[i]);
-                cout << "thetaOrig added" << endl;
                 v_ang->add(angOrig[i]);
-                v_Edep->add(EdepOrig[i]);
+                cout << "angOrig added" << flush << endl;
                 v_Ea->add(EaOrig[i]);
+                cout << "EaOrig added" << flush << endl;
+                v_Edep->add(EdepOrig[i]);
+                cout << "EdepOrig added" << flush << endl;
                 v_Et->add(EtOrig[i]);
                 v_BE->add(BEOrig[i]);
                 v_FE->add(FEOrig[i]);
@@ -144,7 +146,7 @@ public:
                 v_B->add(BIOrig[i]);
 
 
-                cout << "finished adding" << endl;
+                cout << "finished adding" << flush << endl;
                 TPROTONS = TPROTONSOrig;
                 plasticMul = plasticMulOrig;
                 dssdMul = dssdMulOrig;
@@ -156,7 +158,7 @@ public:
             //cout << "filling tree" << endl;
             t->Fill();
         }
-        cout << "returning tree" << endl;
+        cout << "returning tree" << flush << endl;
         //t->Write();
         return t;
     }
@@ -186,8 +188,8 @@ public:
     int NUM;
     TTree *t;
     unique_ptr<DynamicBranchVector<TVector3>> v_dir, v_pos;
-    unique_ptr<DynamicBranchVector<double>> v_Edep;
-    unique_ptr<DynamicBranchVector<double>> v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;
+    //unique_ptr<DynamicBranchVector<double>> v_Edep;
+    unique_ptr<DynamicBranchVector<double>> v_Edep, v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;
     unique_ptr<DynamicBranchVector<short>> v_i;
     unique_ptr<DynamicBranchVector<int>> v_isBeta;
     unique_ptr<DynamicBranchVector<short>> v_F, v_B;
@@ -252,13 +254,13 @@ int main(int argc, char *argv[]) {
         cout << "Printing to:  " << outfile << endl;
 
         TFile output(outfile, "RECREATE");
-        cout << "starting analysis" << endl;
+        cout << "starting analysis" << flush <<  endl;
         auto analysis = new SingleDssdAnalysis(in);
-        cout << "making out tree" << endl;
+        cout << "making out tree" << flush << endl;
         auto outTree = analysis->findSingleDssdHits();
-        cout << "writing out tree" << endl;
+        cout << "writing out tree" << flush << endl;
         outTree->Write();
-        cout << "closing file" << endl;
+        cout << "closing file" << flush << endl;
         output.Close();
 
         clock_t stop = clock();

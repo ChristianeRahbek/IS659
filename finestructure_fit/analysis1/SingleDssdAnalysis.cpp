@@ -119,16 +119,29 @@ public:
 
             if(dssdMulOrig != 1) continue; //this is a single DSSD analysis
 
-            for(UInt_t j = 0; j < mulOrig; j++) {
-                //cout << "i, j = " << i << ", " << j << flush << endl;
+            for(UInt_t j = 0; j < mulOrig; j++) { //looping through each hit
+                if(idOrig[j] > 3) continue; //we only want to save DSSD data
 
-                double tol = 0; //FIX THIS
-                double deltaT = 0; //FIX THIS
+                if(plasticMulOrig > 0) {
+                    for (UInt_t k = 0; k < mulOrig; k++) { //findinf plastic coincidences
+                        if (idOrig[k] < 4) continue; //only looking at plastics
 
-                if(plasticMulOrig > 0 && deltaT < tol) { //should plasticMul>1??
-                    isBeta = 1; // true
-                }
-                else isBeta = 0; // false
+                        double tol = 1500; //maximum allowed timedifference
+                        double deltaT = abs(FTOrig[j] - FTOrig[k]); //time difference between hits
+
+                        bool idBool = (idOrig[j] == 0 && idOrig[k] == 4) || (idOrig[j] == 1 && idOrig[k] == 5);
+
+                        isBeta = 0; // false
+                        if (idBool && deltaT < 5000 && deltaT > 3000) {
+                            cout << "id = " << idOrig[j] << endl;
+                            isBeta = 1; // true
+                            break; //if we have found a beta we can stop looking
+                        }
+                        //else isBeta = 0;
+                    }
+                } else isBeta = 0;
+
+                if(isBeta==1) cout << "... id = " << idOrig[j] << endl;
 
                 //cout << "adding to tree" << flush << endl;
                 v_theta->add(thetaOrig[j]);

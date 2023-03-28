@@ -59,6 +59,14 @@ public:
         v_dir = make_unique<DynamicBranchVector<TVector3>>(*t, "dir");
         v_pos = make_unique<DynamicBranchVector<TVector3>>(*t, "pos");
 
+        v_posX = make_unique<DynamicBranchVector<double>>(*t, "posX", "mul");
+        v_posY = make_unique<DynamicBranchVector<double>>(*t, "posY", "mul");
+        v_posZ = make_unique<DynamicBranchVector<double>>(*t, "posZ", "mul");
+
+        v_dirX = make_unique<DynamicBranchVector<double>>(*t, "dirX", "mul");
+        v_dirY = make_unique<DynamicBranchVector<double>>(*t, "dirY", "mul");
+        v_dirZ = make_unique<DynamicBranchVector<double>>(*t, "dirZ", "mul");
+
         v_theta = make_unique<DynamicBranchVector<double>>(*t, "theta", "mul");
         v_ang = make_unique<DynamicBranchVector<double>>(*t, "angle", "mul");
 
@@ -282,8 +290,18 @@ public:
             else if (hit.Edep>1) plasticMul++;
             else continue;
 
-            v_pos->add(hit.position);
-            v_dir->add(hit.direction);
+            auto pos = hit.position;
+            v_pos->add(pos);
+            v_posX->add(pos.X());
+            v_posY->add(pos.Y());
+            v_posZ->add(pos.Z());
+
+            auto dir = hit.direction;
+            v_dir->add(dir);
+            v_dirX->add(dir.X());
+            v_dirY->add(dir.Y());
+            v_dirZ->add(dir.Z());
+
             v_theta->add(hit.theta * TMath::RadToDeg());
 
             v_Ea->add(hit.Ea);
@@ -326,7 +344,8 @@ public:
         AUSA::clear(
                 *v_Et, *v_Ea, *v_theta, *v_Edep,*v_i, *v_FE, *v_BE,
                 *v_F, *v_B, *v_Ecm,*v_ang, *v_pos, *v_dir,
-                *v_dE, *v_FT, *v_BT
+                *v_dE, *v_FT, *v_BT, *v_posX, *v_posY, *v_posZ, *v_dirX,
+                *v_dirY, *v_dirZ
         );
     }
 
@@ -344,7 +363,7 @@ public:
     int NUM;
     TTree *t;
     unique_ptr<DynamicBranchVector<TVector3>> v_dir, v_pos;
-    unique_ptr<DynamicBranchVector<double>> v_Edep;
+    unique_ptr<DynamicBranchVector<double>> v_Edep, v_posX, v_posY, v_posZ, v_dirX, v_dirY, v_dirZ;
     unique_ptr<DynamicBranchVector<double>> v_Ea, v_Et, v_BE, v_FE, v_theta, v_dE, v_Ecm;
     unique_ptr<DynamicBranchVector<short>> v_i;
     unique_ptr<DynamicBranchVector<short>> v_F, v_B;

@@ -132,16 +132,13 @@ public:
                         bool idBool = (idOrig[j] == 0 && idOrig[k] == 4) || (idOrig[j] == 1 && idOrig[k] == 5);
 
                         isBeta = 0; // false
-                        if (idBool && deltaT < 5000 && deltaT > 3000) {
-                            cout << "id = " << idOrig[j] << endl;
+                        if (idBool && deltaT < 21000 && deltaT > 12000) {
                             isBeta = 1; // true
                             break; //if we have found a beta we can stop looking
                         }
                         //else isBeta = 0;
                     }
                 } else isBeta = 0;
-
-                if(isBeta==1) cout << "... id = " << idOrig[j] << endl;
 
                 //cout << "adding to tree" << flush << endl;
                 v_theta->add(thetaOrig[j]);

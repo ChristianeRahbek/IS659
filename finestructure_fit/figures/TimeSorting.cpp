@@ -14,6 +14,7 @@
 #include <TROOT.h>
 #include "TColor.h"
 #include "TBox.h"
+#include "TLatex.h"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ void TimeSorting() {
     string branchName = "abs(FT0-FT1)";
     string selectionCrit = "((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1))";
     string title = "Process of time sorting";
-    string xLabel = "\u0394T";
+    string xLabel = "#DeltaT";
     int noOfBins = 500;
     int xMin = 0;
     int xMax = 50000;
@@ -54,6 +55,7 @@ void TimeSorting() {
 
 //Making zoom on the graph in the corner
     TPad *p = new TPad("p", "p", .47, .5, 0.97, 0.95); //Where the overlaying canvas (pad) is placed (numbers between 0 and 1)
+    p->SetLogy();
     p->Draw();
     p->cd();
     //p->SetLogy();

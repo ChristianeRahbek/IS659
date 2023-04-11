@@ -9,9 +9,6 @@
 #include "TLegend.h"
 #include "TStyle.h"
 #include "TPad.h"
-#include "TArrow.h"
-#include <TROOT.h>
-#include "TColor.h"
 #include "TBox.h"
 
 using namespace std;
@@ -20,23 +17,23 @@ void Gd148PeakCalibration() {
 /* INSERT INFORMATION HERE*/
 string filePath = "/mnt/d/IS659/finestructure_fit/calibrationAnalysis/output/Run212mlio.root";
 string treeName = "a";
-string branchName = "E";
+string branchName = "E/1000";
 string selectionCrit = "";
 string title = "Run 212";
-string xLabel = "Energy [keV]";
+string xLabel = "Energy [MeV]";
 int noOfBins = 5500;
-int xMin = 2500;
-int xMax = 8000;
+double xMin = 2.500;
+double xMax = 8.000;
 
 string filePath1 = "/mnt/d/IS659/finestructure_fit/calibrationAnalysis/output/Run32mlio.root";
 string treeName1 = "a";
-string branchName1 = "E";
+string branchName1 = "E/1000";
 string selectionCrit1 = "";
 string title1 = "Run 32";
-string xLabel1 = "Energy [keV]";
+string xLabel1 = "Energy [MeV]";
 int noOfBins1 = 5500;
-int xMin1 = 2500;
-int xMax1 = 8000;
+double xMin1 = 2.500;
+double xMax1 = 8.000;
 
 string saveFileName = "148GdPeakCalibration.pdf";
 
@@ -68,11 +65,11 @@ gStyle ->SetPalette(55);
 TPad *p = new TPad("p", "p", .58, .52, 0.95, 0.97); //Where the overlaying canvas (pad) is placed (numbers between 0 and 1)
 p->Draw();
 p->cd();
-p->DrawFrame(3150,0,3220,40000);
+p->DrawFrame(3.150,0,3.220,40000);
 
 auto hist01 = new TH1F("hist01", "hist01", noOfBins, xMin, xMax); //Making this so fit only shows up in the corner figure.
 tr->Draw((branchName +">> hist01").c_str(), selectionCrit.c_str(), "Same");
-hist01->Fit("gaus", "", "", 3175, 3195); //fitting
+hist01->Fit("gaus", "", "", 3.175, 3.195); //fitting
 hist01->GetYaxis()->SetMaxDigits(3);
 
 //hist01->GetYaxis()->ImportAttributes(hist->GetYaxis());
@@ -117,10 +114,10 @@ gStyle ->SetPalette(55);
 TPad *p1 = new TPad("p1", "p1", .58, .52, 0.95, 0.97);
 p1->Draw();
 p1->cd();
-p1->DrawFrame(3150,0,3220,18000);
+p1->DrawFrame(3.150,0,3.220,18000);
 auto hist11 = new TH1F("hist11", "hist11", noOfBins, xMin, xMax);
 tr1->Draw((branchName +">> hist11").c_str(), selectionCrit.c_str(), "Same");
-hist11->Fit("gaus", "", "", 3175, 3195);
+hist11->Fit("gaus", "", "", 3.175, 3.195);
 hist11->GetYaxis()->SetMaxDigits(3);
 
 canv->SaveAs(saveFileName.c_str());

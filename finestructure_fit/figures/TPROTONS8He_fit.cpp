@@ -13,14 +13,31 @@
 using namespace std;
 
 void TPROTONS8He_fit() {
+    int run = 121;
 
-    string filePath = "/mnt/d/IS659/TPROTONS_id8_980.root";
-    string treeName = "a";
-    string branchName = "TPROTONS";
-    string selectionCrit = "hitAng>130 && ((id0==0 && id1==2) ||(id0==2 && id1==0) || (id0==1 && id1 ==3) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && abs(Edep0-Edep1)<500";
+    string filePath, histName;
+    double BG_del, BG_open;
+    if (run==121) {
+        filePath = "/mnt/d/IS659/tprotons_hists.root";
+        histName = "h121";
+        BG_del = 10;
+        BG_open = 300;
+    }
+    else if(run == 163) {
+        filePath = "/mnt/d/IS659/tprotons_hists.root";
+        histName = "h163";
+        BG_del = 15;
+        BG_open = 300;
+    }
+    else {
+        filePath = "/mnt/d/IS659/TPROTONS_id8_980.root";
+        histName = "h";
+        BG_del = 15;
+        BG_open = 300;
+    }
+
     string title = "TPROTONS fit";
     string xLabel = "T [ms]";
-    int noOfBins = 1000;
     int xMin = 0;
     int xMax = 3500;
 
@@ -33,7 +50,7 @@ void TPROTONS8He_fit() {
 
     /* Figure */
     auto *f= new TFile(filePath.c_str());
-    auto *hist = (TH1F*)f->Get("h");
+    auto *hist = (TH1F*)f->Get(histName.c_str());
     /*
     auto *tr=(TTree*)f->Get(treeName.c_str());
     auto hist = new TH1F("hist", title.c_str(), noOfBins, xMin, xMax);
@@ -45,12 +62,50 @@ void TPROTONS8He_fit() {
     double lambda8He = 1/119.1; // 1/halflife of 8He
     double lambda8Li = 1/839.9; // 1/halflife of 8Li
 
-    //string formula = "[0]*exp(-x*" + to_string(lambda8He) + ") + [1]*exp(-x*" + to_string(lambda8Li) + ")";
-    //string formula = "[0]*exp(-log(2)*x/119.1)*(1-exp(-log(2)*x/(0.010*pow(10,-3))))*(0.38*exp(-log(2)*x/(0.020*pow(10,-3)))+(1-0.38)*exp(-log(2)*x/(0.080*pow(10,-3))))";
-    string formula = "[0]*exp(-log(2)*x/119.1)*(1-exp(-log(2)*x/(0.010*pow(10,3))))*(0.38*exp(-log(2)*x/(0.020*pow(10,3)))+(1-0.38)*exp(-log(2)*x/(0.080*pow(10,3))))";
+    string formula;
+    formula = "[0]*exp(-log(2)*(x+[3])/119.1)*(1/[1]*(1-exp(-[1]*(x+[3]))) + 1/([2]+[1])*(exp(-([2]+[1])*(x+[3]))-1)) + [4]*x + [5]";
 
 
-    auto fitFunc = new TF1("fitFunc", formula.c_str());
+    auto fitFunc = new TF1("fitFunc", formula.c_str(), xMin, xMax);
+    fitFunc->SetParameters(100, log(2)/10, log(2)/20);
+    fitFunc->SetParNames("N", "lambda_r", "lambda_f", "t'", "a", "b");
+    fitFunc->SetParLimits(1,pow(10,-3),pow(10,3));
+    fitFunc->SetParLimits(2,pow(10,-3),pow(10,3));
 
-    hist->Fit("fitFunc", "", "", xMin+20, 1000);
+    hist->Fit("fitFunc", "V", "", xMin+BG_del, BG_open+BG_del);
+
+
+    cout << "number of bins fitted = " << hist->GetXaxis()->FindBin(BG_open+BG_del) - hist->GetXaxis()->FindBin(xMin+BG_del) << endl;
+
+
+    /* DRAWING THE FITTED FUNCTION WITHOUT THE BACKGROUND */
+    auto fitfuncCanv = new TCanvas("", "", 1000, 800);
+
+    fitfuncCanv->cd();
+
+    string releaseform;
+    releaseform = "[0]*exp(-log(2)*x/119.1)*(1/[1]*(1-exp(-[1]*x)) + 1/([2]+[1])*(exp(-([2]+[1])*x)-1))";
+
+
+    auto releasefunc = new TF1("releaseFunc", releaseform.c_str(), xMin, xMax); //not really release func
+    releasefunc->SetParameters(fitFunc->GetParameter(0), fitFunc->GetParameter(1), fitFunc->GetParameter(2));
+
+    releasefunc->Draw();
+
+    /* DRAWING THE FITTED RELEASE FUNCTION WITHOUT THE BACKGROUND */
+    auto releasefuncCanv = new TCanvas("", "", 1000, 800);
+
+    releasefuncCanv->cd();
+
+    string relfuncform = "[0]*exp(-log(2)/119.1*x)*(1-exp(-log(1)/[1]*x))*exp(log(2)/[2]*t)";
+    auto relfunc = new TF1("relFunc", relfuncform.c_str(), 0,1000);
+
+    relfunc->SetParameters(1, log(2)/fitFunc->GetParameter(1), log(2)/fitFunc->GetParameter(2));
+
+    relfunc->Draw();
+
+    relfunc->SetParameters(1,10,20);
+
+    relfunc->Draw("same");
+
 }

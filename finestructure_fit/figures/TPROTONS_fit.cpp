@@ -14,7 +14,7 @@ using namespace std;
 
 void TPROTONS_fit() {
 
-    string filePath = "/mnt/d/IS659/finestructure_fit/analysis1/output/doubleDSSD/mergedRuns.root";
+    string filePath = "/mnt/d/IS659/finestructure_fit/analysis1/output/doubleDSSD/Run121mliolio.root";
     string treeName = "a";
     string branchName = "TPROTONS";
     string selectionCrit = "hitAng>130 && ((id0==0 && id1==2) ||(id0==2 && id1==0) || (id0==1 && id1 ==3) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && abs(Edep0-Edep1)<500";
@@ -23,6 +23,9 @@ void TPROTONS_fit() {
     int noOfBins = 1000;
     int xMin = 0;
     int xMax = 3500;
+
+    double BG_del = 10;
+    double BG_open = 300;
 
     string saveFileName = "TPROTONS_fit.pdf";
 
@@ -40,12 +43,16 @@ void TPROTONS_fit() {
     double lambda8He = 1/119.1; // 1/halflife of 8He
     double lambda8Li = 1/839.9; // 1/halflife of 8Li
 
-    //string B = to_string(lambda8He) + "/("+to_string(lambda8Li)+"-"+ to_string(lambda8He)+")";
-    //string formula = "[0]*exp(-x*" + to_string(lambda8He) + ") + [1]*exp(-x*" + to_string(lambda8Li) + ")";
-    string formula = "[0]*exp(-x*[1]) + [2]*exp(-x*[3])";
+    string formula = "[0]*(exp(-log(2)/119.1*(x+[3]))*(-1/(log(2)/119.1+log(2)/11.17)*(exp(-(log(2)/119.1+log(2)/11.17)*(x+[3]))-1)+1/(log(2)/119.1+log(2)/11.17+log(2)/55.12)*(exp(-(log(2)/119.1+log(2)/11.17+log(2)/55.12)*(x+[3]))-1)) + exp(-log(2)/839.9*(x+[3]))*(-1/(2*log(2)/119.1+log(2)/11.17+log(2)/55.12-log(2)/839.9)*(exp(-(2*log(2)/119.1+log(2)/11.17+log(2)/55.12-log(2)/839.9)*(x+[3]))-1)+1/(2*log(2)/119.1+log(2)/11.17-log(2)/839.9)*(exp(-(2*log(2)/119.1+log(2)/11.17-log(2)/839.9)*(x+[3]))-1)))+[1]*(x+[3])+[2]";
+    //string formula = "[0]*(exp(-log(2)/119.1*(x+[3]))*(-1/(log(2)/119.1+log(2)/[4])*(exp(-(log(2)/119.1+log(2)/[4])*(x+[3]))-1)+1/(log(2)/119.1+log(2)/[4]+log(2)/[5])*(exp(-(log(2)/119.1+log(2)/[4]+log(2)/[5])*(x+[3]))-1)) + exp(-log(2)/839.9*(x+[3]))*(-1/(2*log(2)/119.1+log(2)/[4]+log(2)/[5]-log(2)/839.9)*(exp(-(2*log(2)/119.1+log(2)/[4]+log(2)/[5]-log(2)/839.9)*(x+[3]))-1)+1/(2*log(2)/119.1+log(2)/[4]-log(2)/839.9)*(exp(-(2*log(2)/119.1+log(2)/[4]-log(2)/839.9)*(x+[3]))-1)))+[1]*(x+[3])+[2]";
 
 
     auto fitFunc = new TF1("fitFunc", formula.c_str());
+    fitFunc->SetParameters(100, 2.7e-01, -4.79,-1.36e+01,11.17, 55.12);
+    fitFunc->SetParNames("N","a", "b", "t'", "t_f", "t_r");
 
-    hist->Fit("fitFunc", "", "", xMin+200, xMax-1200);
+
+    hist->Fit("fitFunc", "", "", BG_del, BG_del+BG_open);
+
+    cout << "number of bins fitted = " << hist->GetXaxis()->FindBin(BG_open+BG_del) - hist->GetXaxis()->FindBin(xMin+BG_del) << endl;
 }

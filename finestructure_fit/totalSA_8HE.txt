@@ -1,0 +1,7 @@
+Solid angle for U1: 0.87781894
+Solid angle for U2: 0.9868654999999998
+Solid angle for U3: 1.1133593
+Solid angle for U4: 0.84904253
+Total solid angle : 3.8270862699999997
+
+So we cover 0.304549848754812 of 4pi

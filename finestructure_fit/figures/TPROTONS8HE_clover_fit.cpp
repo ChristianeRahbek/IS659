@@ -74,24 +74,30 @@ void TPROTONS8HE_clover_fit() {
 
 
     //auto effFunc = new TF1("effFunc", "[3] * (TMath::Exp( [0]*TMath::Log(x/[4]) + [1]*TMath::Power(TMath::Log(x/[4]), 2) - [2]/TMath::Power(x,3) ) )");
-    auto effFunc = new TF1("effFunc", "[3] * (exp( [0]*log(x/[4]) + [1]*pow(log(x/[4]), 2) - [2]/pow(x,3) ) )");
-    auto eff_d0 = new TF1("d0", "log(x/1000) * effFunc");
-    auto eff_d1 = new TF1("d1", "pow(log(x/1000), 2) * effFunc");
-    auto eff_d2 = new TF1("d2", "-1/pow(x,3) * effFunc");
-    auto eff_d3 = new TF1("d3", "1/[0] * effFunc");
-    auto effFuncErr = new TF1("effFuncErr", "pow([3]*d3,2) + pow([2]*d2,2) + pow([1]*d1,2) + pow([0]*d0,2) + [4]*d0*d1 + [5]*d0*d2 + [6]*d0*d3 + [7]*d1*d2 + [8]*d1*d3 + [9]*d2*d3");
-    auto effErr = new TF1("effErr", "sqrt(pow([0]*effFunc,2)*(pow(effFuncErr/effFunc,2) + pow([0]/[1],2)))");
-            //REMEMBER TO SET PARAMS FOR effFuncErr
+    auto effFunc = new TF1("effFunc", "[3] * (exp( [0]*log(x/[4]) + [1]*pow(log(x/[4]), 2) - [2]/pow(x,3) ) )",1,3000);
+    effFunc->SetParameters(-0.656915, 0.0453174, 761991, 0.000172134, 1000); //setting parameters given from Mads' calibration
+    auto eff_d0 = new TF1("d0", "log(x/1000) * effFunc",1,3000);
+    auto eff_d1 = new TF1("d1", "pow(log(x/1000), 2) * effFunc",1,3000);
+    auto eff_d2 = new TF1("d2", "-1/pow(x,3) * effFunc",1,3000);
+    auto eff_d3 = new TF1("d3", "1/[0] * effFunc",1,3000);
+    auto effFuncErr = new TF1("effFuncErr", "pow([3]*d3,2) + pow([2]*d2,2) + pow([1]*d1,2) + pow([0]*d0,2) + [4]*d0*d1 + [5]*d0*d2 + [6]*d0*d3 + [7]*d1*d2 + [8]*d1*d3 + [9]*d2*d3",1,3000);
+    auto effErr = new TF1("effErr", "sqrt(pow([0]*effFunc,2)*(pow(effFuncErr/effFunc,2) + pow([0]/[1],2)))",1,3000);
+
 
     cout << "Fitting C1:" << endl;
     hist1->Fit("fitFunc", "", "", xMin + BG_del, BG_open + BG_del);
     effFunc->SetParameters(-0.656915, 0.0453174, 761991, 0.000172134, 1000); //setting parameters given from Mads' calibration
-    effFuncErr->SetParameters(0.040494, 0.0423398, 209288  , 1.79534e-06, 0.001564, 6196, 1.113e-08, 8230, 2.732e-08, 0.1435 );
+    effFuncErr->SetParameters(0.040494, 0.0423398, 209288  , 1.79534e-06, 0.001564, 6196, 1.113e-08, 8230, 2.732e-08, 0.1435);
     eff_d3->SetParameter(0, effFunc->GetParameter(3));
     effErr->SetParameters(fitFunc->GetParameter(0),fitFunc->GetParError(0));
     auto eff1 = fitFunc->GetParameter(0)*effFunc->Eval(980);
     auto effErr1 = effErr->Eval(980);
     cout << "N1_eff = " << eff1 << " +- " << effErr1 << endl;
+    cout << effFunc->Eval(980) << endl;
+    cout << eff_d0->Eval(980) << endl;
+    cout << eff_d1->Eval(980) << endl;
+    cout << eff_d2->Eval(980) << endl;
+    cout << eff_d3->Eval(980) << endl;
 
     cout << "Fitting C2:" << endl;
     hist2->Fit("fitFunc", "", "", xMin + BG_del, BG_open + BG_del);
@@ -125,6 +131,7 @@ void TPROTONS8HE_clover_fit() {
     effErr->SetParameters(fitFunc->GetParameter(0),fitFunc->GetParError(0));
     auto eff4 = fitFunc->GetParameter(0)*effFunc->Eval(980);
     auto effErr4 = effErr->Eval(980);
+
     cout << "N4_eff = " << eff4 << " +- " << effErr4 << endl;
 
     cout << "number of bins fitted = " << hist1->GetXaxis()->FindBin(BG_open+BG_del) - hist1->GetXaxis()->FindBin(xMin+BG_del) << endl;

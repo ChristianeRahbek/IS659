@@ -6,9 +6,9 @@
       "file": "dssds/U1.json",
       "calibration": "../finestructure_fit/calout/U1.cal",
       "position": {
-        "x": "-26.61 mm",
-        "y": "-9.42 mm",
-        "z": "-26.61 mm"
+        "x": "-26.11 mm",
+        "y": "-8.92 mm",
+        "z": "-26.11 mm"
       },
       "normal": {
         "x": "1 mm",
@@ -40,9 +40,9 @@
       "file": "dssds/U2.json",
       "calibration": "../finestructure_fit/calout/U2.cal",
       "position": {
-        "x": "-26.79 mm",
-        "y": "-9.42 mm",
-        "z": "26.79 mm"
+        "x": "-26.29 mm",
+        "y": "-8.92 mm",
+        "z": "27.29 mm"
       },
       "normal": {
         "x": "1 mm",
@@ -74,9 +74,9 @@
       "file": "dssds/U3.json",
       "calibration": "../finestructure_fit/calout/U3.cal",
       "position": {
-        "x": "26.61 mm",
-        "y": "-9.42 mm",
-        "z": "26.61 mm"
+        "x": "27.11 mm",
+        "y": "-8.92 mm",
+        "z": "27.11 mm"
       },
       "normal": {
         "x": "-1 mm",
@@ -108,9 +108,9 @@
       "file": "dssds/U4.json",
       "calibration": "../finestructure_fit/calout/U4.cal",
       "position": {
-        "x": "26.79 mm",
-        "y": "-9.42 mm",
-        "z": "-26.79 mm"
+        "x": "27.29 mm",
+        "y": "-8.92 mm",
+        "z": "-26.29 mm"
       },
       "normal": {
         "x": "-1 mm",
@@ -157,8 +157,11 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P1_T",
-        "adc": "P1_E"
+	"prefix": "P1",
+        "tdc": "_T",
+	"multiplicity": "",
+	"segment": "I",
+        "adc": "_E"
       }
     },
     {
@@ -181,8 +184,11 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P2_T",
-        "adc": "P2_E"
+        "prefix": "P2",
+	 "tdc": "_T",
+	 "multiplicity": "",
+	 "segment": "I",
+	 "adc": "_E"
       }
     },
     {
@@ -205,8 +211,11 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P3_T",
-        "adc": "P3_E"
+        "prefix": "P3",
+	"tdc": "_T",
+        "multiplicity": "",
+	"segment": "I",
+	"adc": "_E"
       }
     },
     {
@@ -229,8 +238,11 @@
         "z": "0 mm"
       },
       "mapping": {
-        "tdc": "P4_T",
-        "adc": "P4_E"
+        "prefix": "P4",
+	"tdc": "_T",
+	"multiplicity": "",
+	"segment": "I",
+	"adc": "_E"
       }
     },
     {

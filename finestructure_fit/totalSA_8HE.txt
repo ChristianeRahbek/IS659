@@ -3,5 +3,9 @@ Solid angle for U2: 0.9868654999999998
 Solid angle for U3: 1.1133593
 Solid angle for U4: 0.84904253
 Total solid angle : 3.8270862699999997
+Plus uncertainty of total solid angle: 0.009110580000000201
+Minus uncertainty of total solid angle: 0.009177859999999427
 
-So we cover 0.304549848754812 of 4pi
+So we cover 0.304549848754812+- 0.0007303508930026457 of 4pi
+
+The error is 0.23981325093043768% of the calculated TSA.

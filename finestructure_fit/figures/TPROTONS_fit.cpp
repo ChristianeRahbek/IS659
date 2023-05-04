@@ -48,6 +48,7 @@ void TPROTONS_fit() {
 
 
     auto fitFunc = new TF1("fitFunc", formula.c_str());
+    fitFunc->FixParameter(3, -1.36e+01);
     fitFunc->SetParameters(100, 2.7e-01, -4.79,-1.36e+01,11.17, 55.12);
     fitFunc->SetParNames("N","a", "b", "t'", "t_f", "t_r");
 

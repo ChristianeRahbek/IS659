@@ -18,7 +18,7 @@ public:
     MergeTTrees() {
         toBeMerged = new TList();
 
-        filePath = EUtil::getProjectRoot() + "/output/doubleDSSD/"; //change this path if I want to merge other types of analysis files
+        filePath = EUtil::getProjectRoot() + "/output/preAnalysis/"; //change this path if I want to merge other types of analysis files
     }
 
     void doMerching(){
@@ -46,7 +46,7 @@ public:
 private:
     void addTreesToList() { // adds each run to a list
         for(auto& run : runs){
-            TFile *f = new TFile((filePath + "Run" + to_string(run) + "mliolio.root").c_str());
+            TFile *f = new TFile((filePath + "Run" + to_string(run) + "mlio.root").c_str());
             TTree *a = (TTree *) f->Get("a");
 
             toBeMerged->Add(a);

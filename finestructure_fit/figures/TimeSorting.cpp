@@ -52,6 +52,8 @@ void TimeSorting() {
     gStyle ->SetOptStat(kFALSE);
     gStyle ->SetPalette(55);
 
+    gPad->SetTickx();
+    gPad->SetTicky();
 
 //Making zoom on the graph in the corner
     TPad *p = new TPad("p", "p", .47, .5, 0.97, 0.95); //Where the overlaying canvas (pad) is placed (numbers between 0 and 1)
@@ -69,6 +71,9 @@ void TimeSorting() {
     hist01->GetYaxis()->SetMaxDigits(3);
     hist01->SetTitle("");
     hist01->Draw();
+
+    gPad->SetTickx();
+    gPad->SetTicky();
 
     canv->cd();
     canv->Update();

@@ -16,6 +16,9 @@
 #include <libconfig.h++>
 #include "projectutil.h"
 #include <TH2D.h>
+#include <TF1.h>
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace AUSA::Sort;
@@ -31,6 +34,10 @@ public:
 
     int matrixSize;
 
+    TH1F* effHist;
+
+    std::vector<double> hitAngBins, solidAngsBins;
+
     shared_ptr<Setup> setup, errSetup;
 
     shared_ptr<DoubleSidedDetector> det1, det2, det3, det4;
@@ -43,6 +50,8 @@ public:
         this->filename = filename;
 
         setup = JSON::readSetupFromJSON(setupFilename);
+
+        effHist = new TH1F("effHist", "effHist", 181, 0, 180);
 
         det1 = setup->getDSSD(0);
         det2 = setup->getDSSD(1);
@@ -63,6 +72,10 @@ public:
         saU11 = 0; saU12 = 0; saU13 = 0; saU14 = 0; saU22 = 0; saU23 = 0; saU24 = 0; saU33 = 0; saU34 = 0; saU44 = 0;
         saU11err = 0; saU12err = 0; saU13err = 0; saU14err = 0; saU22err = 0; saU23err = 0; saU24err = 0; saU33err = 0;
         saU34err = 0; saU44err = 0;
+
+        for(int n = 0; n <=180; n++) {
+            hitAngBins.push_back(n);
+        }
     }
 
     void calculateSAs() {
@@ -140,9 +153,46 @@ public:
         }
     }
 
+    void calcSABins() {
+        for(int i = 0; i<=180; i++) {
+            double solidAngs = 0;
+            double solidAngErr = 0;
+            for(int j = 0; j < hitAngles.size(); j++) {
+                auto ang = hitAngles[j];
+                if((ang >= hitAngBins[i]) && (ang < hitAngBins[i+1])) {
+                    solidAngs += SAs[j];
+                    solidAngErr += SAerrs[j]; //FIX UNCERTAINTIES, THIS IS NOT RIGHT
+                }
+            }
+            solidAngsBins.push_back(solidAngs);
+        }
+    }
+
+    TH1F* calcEffectiveNoOfDetections(string dataFile, string selectionCrit){
+        //return a histogram with the effective number of detections
+
+        auto *f= new TFile(dataFile.c_str());
+        auto *tr=(TTree*)f->Get("a");
+        auto hist = new TH1F("hist", "hist", hitAngBins.size(), 0, 180);
+        tr->Draw("hitAng >> hist", selectionCrit.c_str());
+
+        for(int i = 0; i < hist->GetEntries(); i++) {
+            auto entry = hist->GetBinContent(i+1);
+            auto eff = solidAngsBins[i];
+            double effEntry;
+            if(eff==0) effEntry = 0;
+            else effEntry = entry/eff;
+            effHist->SetBinContent(i,effEntry);
+        }
+
+        return effHist;
+    }
+
     void plotSA() {
 
         auto *canv = new TCanvas("", "", 1500, 700);
+
+        canv->cd();
 
 
         int size = SAs.size();
@@ -151,7 +201,7 @@ public:
 
         cout << graph->GetN() << endl;
 
-        graph->Draw();
+        graph->Draw("");
 
         graph->DrawGraph(size,&hitAngles[0], &SAs[0], "B");
 
@@ -192,7 +242,9 @@ public:
         }
         outfile << "hitAngles" << " " << "Solid angles" << endl;
         for(int i = 0; i < SAs.size(); i++) {
-            outfile << hitAngles[i] << " " << SAs[i] << endl;
+            if(SAs[i]>0){
+                outfile << hitAngles[i] << " " << SAs[i] << endl;
+            }
         }
         outfile.close();
     }
@@ -261,6 +313,7 @@ int main() {
     string filename = EUtil::getProjectRoot() + "/../SAM8He.txt";
     string setupFilename = EUtil::getProjectRoot() + "/../../setup/setup.json";
     string errFilename = EUtil::getProjectRoot() + "/../SAM8He_mUS.txt";
+    string dataFileName = EUtil::getProjectRoot() + "/../analysis1/output/doubleDSSD/mergedRuns.root";
 
     cout << "defining SAcalc" << endl;
     auto SAcalc = new SolidAngleClac_alpha_t(filename, setupFilename, errFilename);
@@ -272,7 +325,31 @@ int main() {
 
     cout << "saving to txt" << endl;
     SAcalc->printDataToTxt();
+    SAcalc->calcSABins();
 
+    auto effHist0Deg = SAcalc->calcEffectiveNoOfDetections(
+            dataFileName,"id0==id1 && abs(FT0-FT1)<1500 && (Edep0<1000 || Edep1<1000)");
+    auto effHist180Deg = SAcalc->calcEffectiveNoOfDetections(
+            dataFileName,"((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng < 130");
+
+    auto canv0Deg = new TCanvas();
+    canv0Deg->cd();
+    effHist0Deg->Draw();
+    canv0Deg->Update();
+    canv0Deg->Draw();
+    canv0Deg->SaveAs((EUtil::getProjectRoot() + "/effHist0Deg.png").c_str());
+
+    /*
+    auto canv180Deg = new TCanvas();
+    canv180Deg->cd();
+    effHist180Deg->Draw();
+    canv180Deg->Update();
+    canv180Deg->Draw();
+    canv180Deg->SaveAs((EUtil::getProjectRoot() + "/effHist180Deg.png").c_str());
+
+     */
+
+    /*
     cout << "find total SA in range" << endl;
     auto SA0degVec = SAcalc->findingTotalSAinRange(0,80);
     auto SA180degVec = SAcalc->findingTotalSAinRange(90,130);
@@ -286,6 +363,7 @@ int main() {
 
     cout << "Total solid angle in 0deg detectors is " << SA0deg << "+-" << SA0degErr << endl;
     cout << "Total solid angle in 180deg detectors is " << SA180deg << "+-" << SA180degErr << endl;
+     */
 
     return EXIT_SUCCESS;
 }

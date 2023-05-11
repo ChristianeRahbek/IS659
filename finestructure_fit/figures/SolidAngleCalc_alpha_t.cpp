@@ -168,24 +168,45 @@ public:
         }
     }
 
-    TH1F* calcEffectiveNoOfDetections(string dataFile, string selectionCrit){
-        //return a histogram with the effective number of detections
+    double calcEffectiveNoOfDetections(string dataFile, string selectionCrit){
+        //return the effective number of detections in file "dataFile" with selection criteria "selectionCrit"
 
+        cout << "hitAngBins.size() = " << hitAngBins.size() << endl;
+        cout << "solidAngsBins.size() = " << solidAngsBins.size() << endl;
+
+        double totalEff = 0;
         auto *f= new TFile(dataFile.c_str());
         auto *tr=(TTree*)f->Get("a");
         auto hist = new TH1F("hist", "hist", hitAngBins.size(), 0, 180);
         tr->Draw("hitAng >> hist", selectionCrit.c_str());
 
-        for(int i = 0; i < hist->GetEntries(); i++) {
+        for(int i = 0; i < hist->GetNbinsX(); i++) {
             auto entry = hist->GetBinContent(i+1);
             auto eff = solidAngsBins[i];
             double effEntry;
+            if(isnan(eff) || isnan(entry)) {
+                cout << "i = " << i << endl;
+                cout << "bincontent = " << entry << endl;
+                cout << "eff = " << eff << endl;
+            }
             if(eff==0) effEntry = 0;
             else effEntry = entry/eff;
-            effHist->SetBinContent(i,effEntry);
+            totalEff += effEntry;
+            /*
+            if (i < 3) {
+                cout << "i = " << i << endl;
+                cout << "bincontent = " << entry << endl;
+                cout << "eff = " << eff << endl;
+                cout << "effective number of detections in bin = " << effEntry << endl;
+                cout << "total number of effective detections = " << totalEff << endl;
+            }
+             */
+            //effHist->SetBinContent(i,effEntry); //tried to return this, but I changed my mind...
         }
 
-        return effHist;
+        cout << "total eff = " << totalEff << endl;
+        cout << "" << endl;
+        return totalEff;
     }
 
     void plotSA() {
@@ -194,12 +215,10 @@ public:
 
         canv->cd();
 
-
         int size = SAs.size();
 
         auto *graph = new TGraph(size, &hitAngles[0], &SAs[0]);
 
-        cout << graph->GetN() << endl;
 
         graph->Draw("");
 
@@ -327,11 +346,31 @@ int main() {
     SAcalc->printDataToTxt();
     SAcalc->calcSABins();
 
-    auto effHist0Deg = SAcalc->calcEffectiveNoOfDetections(
-            dataFileName,"id0==id1 && abs(FT0-FT1)<1500 && (Edep0<1000 || Edep1<1000)");
-    auto effHist180Deg = SAcalc->calcEffectiveNoOfDetections(
-            dataFileName,"((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng < 130");
+    double totalSA = 0;
+    for(int i = 0; i < SAcalc->SAs.size(); i++) {
+        totalSA += (SAcalc->SAs)[i];
+    }
 
+    cout << "total efficiency of all detectors " << totalSA << "radians/(4pi)" << endl;
+
+    string outfileName = EUtil::getProjectRoot() + "/efficiencyOfCounts.txt";
+    ofstream outfile(outfileName);
+    if (!outfile.is_open()) {
+        cerr << "Error: Unable to open file \n";
+    } else {
+        auto effReactions0Deg = SAcalc->calcEffectiveNoOfDetections(
+                dataFileName, "id0==id1 && abs(FT0-FT1)<1500 && (Edep0<1000 || Edep1<1000)");
+        outfile << "Total number of decays in 0deg range is " << effReactions0Deg << endl;
+
+        auto effReactions180Deg = SAcalc->calcEffectiveNoOfDetections(
+                dataFileName,
+                "((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng < 130");
+        outfile << "Total number of decays in 180deg range is " << effReactions180Deg << endl;
+
+        outfile.close();
+    }
+
+    /*
     auto canv0Deg = new TCanvas();
     canv0Deg->cd();
     effHist0Deg->Draw();
@@ -339,14 +378,12 @@ int main() {
     canv0Deg->Draw();
     canv0Deg->SaveAs((EUtil::getProjectRoot() + "/effHist0Deg.png").c_str());
 
-    /*
     auto canv180Deg = new TCanvas();
     canv180Deg->cd();
     effHist180Deg->Draw();
     canv180Deg->Update();
     canv180Deg->Draw();
     canv180Deg->SaveAs((EUtil::getProjectRoot() + "/effHist180Deg.png").c_str());
-
      */
 
     /*

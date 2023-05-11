@@ -1,0 +1,2 @@
+Total number of decays in 0deg range is 1.0803e+08
+Total number of decays in 180deg range is 5.77427e+07

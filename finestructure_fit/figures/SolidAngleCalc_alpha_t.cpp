@@ -36,7 +36,7 @@ public:
 
     TH1F* effHist;
 
-    std::vector<double> hitAngBins, solidAngsBins;
+    std::vector<double> hitAngBins, solidAngsBins, solidAngsBinsAlt;
 
     shared_ptr<Setup> setup, errSetup;
 
@@ -51,7 +51,7 @@ public:
 
         setup = JSON::readSetupFromJSON(setupFilename);
 
-        effHist = new TH1F("effHist", "effHist", 181, 0, 180);
+        effHist = new TH1F("effHist", "effHist", 37, 0, 180);
 
         det1 = setup->getDSSD(0);
         det2 = setup->getDSSD(1);
@@ -73,8 +73,9 @@ public:
         saU11err = 0; saU12err = 0; saU13err = 0; saU14err = 0; saU22err = 0; saU23err = 0; saU24err = 0; saU33err = 0;
         saU34err = 0; saU44err = 0;
 
-        for(int n = 0; n <=180; n++) {
-            hitAngBins.push_back(n);
+        int a = 5;
+        for(int n = 0; n <=180/a; n++) {
+            hitAngBins.push_back(a*n);
         }
     }
 
@@ -83,6 +84,7 @@ public:
             for (int j1 = 0; j1 < matrixSize; j1++) { //now I can find i'th, j'th entry in first matrix
                 for (int i2 = 0; i2 < matrixSize; i2++) {
                     for (int j2 = 0; j2 < matrixSize; j2++) { //now I can find i'th, j'th entry in second matrix
+
                         saU11 = calculateSA(U1_SAM, U1_SAM, i1, j1, i2, j2);
                         saU12 = calculateSA(U1_SAM, U2_SAM, i1, j1, i2, j2);
                         saU13 = calculateSA(U1_SAM, U3_SAM, i1, j1, i2, j2);
@@ -111,7 +113,7 @@ public:
                         auto& p1U4 = det4->getPixelPosition(i1+1, j1+1);
                         auto& p2U1 = det1->getPixelPosition(i2+1, j2+1);
                         auto& p2U2 = det2->getPixelPosition(i2+1, j2+1);
-                        auto& p2U3 = det2->getPixelPosition(i2+1, j2+1);
+                        auto& p2U3 = det3->getPixelPosition(i2+1, j2+1);
                         auto& p2U4 = det4->getPixelPosition(i2+1, j2+1);
 
                         SAs.push_back(saU11);
@@ -147,6 +149,7 @@ public:
                         hitAngles.push_back(p1U3.Angle(p2U4) * TMath::RadToDeg());
                         hitAngles.push_back(p1U4.Angle(p2U4) * TMath::RadToDeg());
 
+
                     }
                 }
             }
@@ -154,7 +157,7 @@ public:
     }
 
     void calcSABins() {
-        for(int i = 0; i<=180; i++) {
+        for(int i = 0; i<hitAngBins.size(); i++) {
             double solidAngs = 0;
             double solidAngErr = 0;
             for(int j = 0; j < hitAngles.size(); j++) {
@@ -165,20 +168,28 @@ public:
                 }
             }
             solidAngsBins.push_back(solidAngs);
+            solidAngsBinsAlt.push_back(solidAngs/TMath::Power(4*TMath::Pi(),2));
         }
     }
 
-    double calcEffectiveNoOfDetections(string dataFile, string selectionCrit){
+    double calcEffectiveNoOfDetections(string dataFile, string selectionCrit, int degs){
         //return the effective number of detections in file "dataFile" with selection criteria "selectionCrit"
 
         cout << "hitAngBins.size() = " << hitAngBins.size() << endl;
         cout << "solidAngsBins.size() = " << solidAngsBins.size() << endl;
 
+        auto canv = new TCanvas();
         double totalEff = 0;
         auto *f= new TFile(dataFile.c_str());
         auto *tr=(TTree*)f->Get("a");
         auto hist = new TH1F("hist", "hist", hitAngBins.size(), 0, 180);
         tr->Draw("hitAng >> hist", selectionCrit.c_str());
+        canv->Update();
+        canv->Draw();
+        canv->SaveAs((EUtil::getProjectRoot()+"/DataHitAng" + to_string(degs) + "degs.pdf").c_str());
+
+        auto canv1 = new TCanvas();
+        auto effNHist = new TH1F("effNHist", "effNHist", hitAngBins.size(), 0, 180);
 
         for(int i = 0; i < hist->GetNbinsX(); i++) {
             auto entry = hist->GetBinContent(i+1);
@@ -190,19 +201,18 @@ public:
                 cout << "eff = " << eff << endl;
             }
             if(eff==0) effEntry = 0;
-            else effEntry = entry/eff;
+            else effEntry = (entry/eff);//TMath::Power(4*TMath::Pi(),2);
+
             totalEff += effEntry;
-            /*
-            if (i < 3) {
-                cout << "i = " << i << endl;
-                cout << "bincontent = " << entry << endl;
-                cout << "eff = " << eff << endl;
-                cout << "effective number of detections in bin = " << effEntry << endl;
-                cout << "total number of effective detections = " << totalEff << endl;
-            }
-             */
+
+            effNHist->SetBinContent(i+1, effEntry);
             //effHist->SetBinContent(i,effEntry); //tried to return this, but I changed my mind...
         }
+
+        effNHist->Draw();
+        canv1->Update();
+        canv1->Draw();
+        canv1->SaveAs((EUtil::getProjectRoot()+"/EffNHist" + to_string(degs) + "degCoincidences.pdf").c_str());
 
         cout << "total eff = " << totalEff << endl;
         cout << "" << endl;
@@ -233,6 +243,25 @@ public:
         canv->SaveAs((EUtil::getProjectRoot() + "/SolidAngleTritonAlpha.png").c_str());
 
 
+    }
+
+    void plotEff(bool isAlt) {
+        auto canv = new TCanvas();
+        TGraph *graph;
+        if(isAlt) {
+            graph = new TGraph(solidAngsBins.size(), &hitAngBins[0], &solidAngsBinsAlt[0]);
+        }
+        else {
+            graph = new TGraph(solidAngsBins.size(), &hitAngBins[0], &solidAngsBins[0]);
+        }
+        graph->Draw();
+        canv->Update();
+        canv->Draw();
+        if(isAlt) {
+            canv->SaveAs((EUtil::getProjectRoot()+"/EffPlotAlt.pdf").c_str());
+        } else {
+            canv->SaveAs((EUtil::getProjectRoot()+"/EffPlot.pdf").c_str());
+        }
     }
 
     std::vector<double> findingTotalSAinRange(double theta_min, double theta_max){
@@ -300,9 +329,13 @@ private:
         double omega1 = m1[i1][j1]/(4*TMath::Pi());
         double omega2 = m2[i2][j2]/(4*TMath::Pi());
 
+        if(i1 == i2 && j1 == j2 && m1 == m2) return 0;
+        else return omega1 * omega2;
+        /*
         if (i1 != i2 && j1 != j2 && m1 != m2) {
-            return 2 * omega1 * omega2;
-        } else return TMath::Power(omega1, 2) + TMath::Power(omega2, 2);
+            return omega1 * omega2;
+        } else return 0;
+         */
     }
 
     double calculateSAerrSq(std::vector<std::vector<double>> m1, std::vector<std::vector<double>> m2,
@@ -351,56 +384,33 @@ int main() {
         totalSA += (SAcalc->SAs)[i];
     }
 
-    cout << "total efficiency of all detectors " << totalSA << "radians/(4pi)" << endl;
+    cout << "total efficiency of all detectors " << totalSA << "radians/(4pi)^2" << endl;
 
     string outfileName = EUtil::getProjectRoot() + "/efficiencyOfCounts.txt";
     ofstream outfile(outfileName);
     if (!outfile.is_open()) {
         cerr << "Error: Unable to open file \n";
     } else {
+        outfile << "Alpha-t coincidences" << endl;
         auto effReactions0Deg = SAcalc->calcEffectiveNoOfDetections(
-                dataFileName, "id0==id1 && abs(FT0-FT1)<1500 && (Edep0<1000 || Edep1<1000)");
+                dataFileName, "id0==id1 && abs(FT0-FT1)<1500 && (Edep0<1000 || Edep1<1000)", 0);
         outfile << "Total number of decays in 0deg range is " << effReactions0Deg << endl;
 
         auto effReactions180Deg = SAcalc->calcEffectiveNoOfDetections(
                 dataFileName,
-                "((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng < 130");
+                "((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng < 130", 180);
         outfile << "Total number of decays in 180deg range is " << effReactions180Deg << endl;
 
+        auto eff8Li = SAcalc->calcEffectiveNoOfDetections(
+                dataFileName,
+                "((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && hitAng > 130 && abs(Edep0-Edep1)<500",
+                130);
+        outfile << "Total number of decays in 8Li is " << eff8Li << endl;
+
+        SAcalc->plotEff(true);
+        SAcalc->plotEff(false);
         outfile.close();
     }
-
-    /*
-    auto canv0Deg = new TCanvas();
-    canv0Deg->cd();
-    effHist0Deg->Draw();
-    canv0Deg->Update();
-    canv0Deg->Draw();
-    canv0Deg->SaveAs((EUtil::getProjectRoot() + "/effHist0Deg.png").c_str());
-
-    auto canv180Deg = new TCanvas();
-    canv180Deg->cd();
-    effHist180Deg->Draw();
-    canv180Deg->Update();
-    canv180Deg->Draw();
-    canv180Deg->SaveAs((EUtil::getProjectRoot() + "/effHist180Deg.png").c_str());
-     */
-
-    /*
-    cout << "find total SA in range" << endl;
-    auto SA0degVec = SAcalc->findingTotalSAinRange(0,80);
-    auto SA180degVec = SAcalc->findingTotalSAinRange(90,130);
-
-    cout << "calling vectors" << endl;
-    auto SA0deg = SA0degVec[0];
-    auto SA0degErr = SA0degVec[1];
-
-    auto SA180deg = SA180degVec[0];
-    auto SA180degErr = SA180degVec[1];
-
-    cout << "Total solid angle in 0deg detectors is " << SA0deg << "+-" << SA0degErr << endl;
-    cout << "Total solid angle in 180deg detectors is " << SA180deg << "+-" << SA180degErr << endl;
-     */
 
     return EXIT_SUCCESS;
 }

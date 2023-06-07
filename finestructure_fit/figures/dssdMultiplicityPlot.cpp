@@ -16,7 +16,7 @@ void dssdMultiplicityPlot(){
     string branchName = "dssdMul";
 
     string xLabel = "DSSD multiplicity";
-    string yLabel = "N";
+    string yLabel = "Entries/bin";
     string option = "";
 
     int noOfBins = 9;
@@ -44,15 +44,15 @@ void dssdMultiplicityPlot(){
     hist->GetXaxis()->SetBinLabel(9, "8");
     hist->LabelsOption("h");
 
-    hist->GetXaxis()->SetLabelSize(0.06); //size is in percent of pad size
-    hist->GetYaxis()->SetLabelSize();
-    hist->GetXaxis()->SetTitleSize(0.05);
-    hist->GetYaxis()->SetTitleSize(0.05);
-
     tr->Draw((branchName +">> hist").c_str(), "", option.c_str());
 
     hist->SetXTitle(xLabel.c_str());
     hist->SetYTitle(yLabel.c_str());
+    hist->GetXaxis()->SetLabelSize(0.08);
+    hist->GetXaxis()->SetTitleSize(0.05);
+    hist->GetYaxis()->SetLabelSize(0.05);
+    hist->GetYaxis()->SetTitleSize(0.05);
+    hist->GetYaxis()->SetTitleOffset(0.85);
 
     hist->SetStats(kFALSE);
 

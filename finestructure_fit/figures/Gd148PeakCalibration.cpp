@@ -51,12 +51,18 @@ auto hist = new TH1F("hist", title.c_str(), noOfBins, xMin, xMax);
 tr->Draw((branchName +">> hist").c_str(), selectionCrit.c_str());
 
 hist ->SetXTitle(xLabel.c_str());
-hist->SetYTitle("Events");
+hist->SetYTitle("Events/bin [MeV^{-1}]");
 canv->SetLeftMargin(0.1);
 hist->GetYaxis()->SetTitleOffset(1);
 hist->GetYaxis()->SetMaxDigits(3); //Setting numbers on axis to x*10^y
 gStyle ->SetOptStat(kFALSE);
 gStyle ->SetPalette(55);
+canv->GetPad(1)->SetTickx();
+canv->GetPad(1)->SetTicky();
+hist->GetXaxis()->SetTitleSize(0.05);
+hist->GetXaxis()->SetLabelSize(0.05);
+hist->GetYaxis()->SetTitleSize(0.05);
+hist->GetYaxis()->SetLabelSize(0.05);
 
 //TArrow *ar = new TArrow(0.3,0.9, 0.95, 0.95, 0.05, "|>");
 //ar->Draw();
@@ -65,6 +71,8 @@ gStyle ->SetPalette(55);
 TPad *p = new TPad("p", "p", .58, .52, 0.95, 0.97); //Where the overlaying canvas (pad) is placed (numbers between 0 and 1)
 p->Draw();
 p->cd();
+p->SetTicky();
+p->SetTickx();
 p->DrawFrame(3.150,0,3.220,40000);
 
 auto hist01 = new TH1F("hist01", "hist01", noOfBins, xMin, xMax); //Making this so fit only shows up in the corner figure.
@@ -103,17 +111,25 @@ auto hist1 = new TH1F("hist1", title1.c_str(), noOfBins1, xMin1, xMax1);
 tr1->Draw((branchName1 +">> hist1").c_str(), selectionCrit1.c_str());
 
 hist1 ->SetXTitle(xLabel1.c_str());
-hist1->SetYTitle("Events");
+hist1->SetYTitle("Events/bin [MeV^{-1}]");
 canv->SetLeftMargin(0.1);
 hist1->GetYaxis()->SetTitleOffset(1);
 hist1->GetYaxis()->SetMaxDigits(3); //Setting numbers on axis to x*10^y
 gStyle ->SetOptStat(kFALSE);
 gStyle ->SetPalette(55);
+canv->GetPad(2)->SetTickx();
+canv->GetPad(2)->SetTicky();
+hist1->GetXaxis()->SetTitleSize(0.05);
+hist1->GetXaxis()->SetLabelSize(0.05);
+hist1->GetYaxis()->SetTitleSize(0.05);
+hist1->GetYaxis()->SetLabelSize(0.05);
 
 //Making zoom on the graph in the corner
 TPad *p1 = new TPad("p1", "p1", .58, .52, 0.95, 0.97);
 p1->Draw();
 p1->cd();
+p1->SetTicky();
+p1->SetTickx();
 p1->DrawFrame(3.150,0,3.220,18000);
 auto hist11 = new TH1F("hist11", "hist11", noOfBins, xMin, xMax);
 tr1->Draw((branchName +">> hist11").c_str(), selectionCrit.c_str(), "Same");

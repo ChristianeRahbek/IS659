@@ -19,7 +19,7 @@ void Na20ExSpec(){
     string treeName = "a";
     string branchName = "Ex/1000";
     string selectionCrit = "";
-    string title = "Excitation Energies of ^{20}Na";
+    string title = "Excitation Energies of ^{20}Ne";
     string xLabel = "Energy [MeV]";
     int noOfBins = 7000;
     double xMin = 4.500;
@@ -31,19 +31,35 @@ void Na20ExSpec(){
     auto *tr=(TTree*)f->Get(treeName.c_str());
     auto hist = new TH1F("hist", title.c_str(), noOfBins, xMin, xMax);
     tr->Draw((branchName +">> hist").c_str(), selectionCrit.c_str());
+    gPad->SetTickx();
+    gPad->SetTicky();
 
     hist ->SetXTitle(xLabel.c_str());
-    hist->SetYTitle("Events");
+    hist->SetYTitle("Events/bin [MeV^{-1}]");
     gStyle ->SetOptStat(kFALSE);
+
+    hist->GetXaxis()->SetLabelSize(0.04);
+    hist->GetXaxis()->SetTitleSize(0.04);
+    hist->GetYaxis()->SetLabelSize(0.04);
+    hist->GetYaxis()->SetTitleSize(0.04);
+    hist->GetYaxis()->SetMaxDigits(2);
+    hist->GetYaxis()->SetTitleOffset(1);
+    hist->GetXaxis()->SetTitleOffset(0.95);
+
 
     TPad *p = new TPad("p", "p", .50, .40, 0.95, 0.92); //Where the overlaying canvas (pad) is placed (numbers between 0 and 1)
     p->Draw();
     p->cd();
+    p->SetTickx();
+    p->SetTicky();
     p->DrawFrame(6.80,0,8.0,500);
 
     auto hist01 = new TH1F("hist01", "hist01", noOfBins, xMin, xMax); //Making this so fit only shows up in the corner figure.
     tr->Draw((branchName +">> hist01").c_str(), selectionCrit.c_str(), "Same");
     hist01->Fit("gaus", "", "", 7.37, 7.48); //fitting
+    hist01->GetYaxis()->SetMaxDigits(3);
+    hist01->GetYaxis()->SetLabelSize(0.15);
+    hist01->GetXaxis()->SetLabelSize(0.15);
     hist01->GetYaxis()->SetMaxDigits(3);
 
     canv->Update();

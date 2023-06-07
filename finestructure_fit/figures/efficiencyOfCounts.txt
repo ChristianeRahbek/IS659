@@ -1,2 +1,4 @@
-Total number of decays in 0deg range is 1.0803e+08
-Total number of decays in 180deg range is 5.77427e+07
+Alpha-t coincidences
+Total number of decays in 0deg range is 4.68209e+07
+Total number of decays in 180deg range is 2.18291e+07
+Total number of decays in 8Li is 3.37842e+10

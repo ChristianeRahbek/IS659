@@ -24,7 +24,7 @@ void TimeSorting0Deg() {
     string branchName = "abs(FT0-FT1)";
     string selectionCrit = "id0==id1";
     string title = "";
-    string xLabel = "#DeltaT";
+    string xLabel = "#DeltaT [ns]";
     int noOfBins = 500;
     int xMin = 0;
     int xMax = 50000;
@@ -43,7 +43,7 @@ void TimeSorting0Deg() {
     tr->Draw((branchName +">> hist").c_str(), selectionCrit.c_str());
 
     hist->SetXTitle(xLabel.c_str());
-    hist->SetYTitle("Events");
+    hist->SetYTitle("Events/bin [ns^{-1}]");
     canv->SetLeftMargin(0.1);
     hist->GetYaxis()->SetTitleOffset(1);
     hist->GetYaxis()->SetMaxDigits(3); //Setting numbers on axis to x*10^y
@@ -53,6 +53,13 @@ void TimeSorting0Deg() {
 
     gPad->SetTickx();
     gPad->SetTicky();
+
+    hist->GetYaxis()->SetLabelSize(0.05);
+    hist->GetYaxis()->SetTitleSize(0.05);
+    hist->GetXaxis()->SetLabelSize(0.05);
+    hist->GetXaxis()->SetTitleSize(0.05);
+    hist->GetXaxis()->SetTitleOffset(0.95);
+    hist->GetYaxis()->SetTitleOffset(0.8);
 
 /*
 //Making zoom on the graph in the corner
@@ -85,7 +92,7 @@ void TimeSorting0Deg() {
     auto *BGarrow = new TArrow(33000,1700,32000,400, 0.01,"|>");
     BGarrow->Draw();
     auto BGtext = new TLatex(33027.5,1710.34,"Background");
-    BGtext->SetTextSize(0.03);
+    BGtext->SetTextSize(0.035);
     BGtext->Draw();
 
     auto *CoinArrow = new TArrow(4250,15942,1100,13000, 0.01,"|>");
@@ -95,7 +102,7 @@ void TimeSorting0Deg() {
     auto *CoinArrow2 = new TArrow(4250,15942,13000,3000, 0.01,"|>");
     CoinArrow2->Draw();
     auto CoinText = new TLatex(4306,15942,"Valid coincidences");
-    CoinText->SetTextSize(0.03);
+    CoinText->SetTextSize(0.035);
     CoinText->Draw();
 
 

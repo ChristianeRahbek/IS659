@@ -33,10 +33,10 @@ plt.figure()
 fig1, ax1 = plt.subplots(figsize = (10,5))
 
 xmin = 0
-xmax = 180
-hitAngsbins = np.linspace(xmin, xmax, xmax-xmin+1)
+xmax = 36
+hitAngsbins = 5*np.linspace(xmin, xmax, xmax-xmin+1)
 
-solidAngsBins = np.zeros(181)
+solidAngsBins = np.zeros(xmax-xmin+1)
 
 
 for i in range(xmin, xmax):
@@ -45,13 +45,18 @@ for i in range(xmin, xmax):
         if((ang >= hitAngsbins[i]) & (ang < hitAngsbins[i+1])):
             solidAngsBins[i] += solidAngs[j]
     
-ax1.bar(hitAngsbins, solidAngsBins)
+ax1.bar(hitAngsbins, solidAngsBins, yerr = solidAngsBins*0.01,width = 5, align = 'edge')
 
-plt.xlabel(r"$\theta_{\alpha t}$", fontsize = 'x-large')
-plt.ylabel(r"$\epsilon_{\alpha t} / bin$", fontsize = 'x-large')
+mysize = 15
+
+plt.xlabel(r"$\theta_{p_1p_2}$", fontsize = mysize+3)
+plt.ylabel(r"$\epsilon_{p_1p_2} / 5\degree$", fontsize = mysize+3)
 
 ax1.ticklabel_format(axis = 'y', style = 'sci', scilimits=(-5,-5))
 
-ax1.tick_params(axis='both', which='both', direction='inout', top = True, right = True)
+ax1.tick_params(axis='both', which='both', direction='inout', top = True, right = True, labelsize =mysize)
 
-fig1.savefig('SolidAngleEfficiency.pdf')
+ax1.yaxis.offsetText.set_fontsize(mysize)
+
+fig1.savefig('SolidAngleEfficiency.png')
+print("done")

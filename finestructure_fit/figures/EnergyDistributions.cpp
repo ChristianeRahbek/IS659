@@ -24,7 +24,7 @@ void EnergyDistributions() {
     string selectionCrit90 =
             "((id0 == 0 && (id1 == 3 || id1 == 1)) || (id0 == 1 && (id1 == 0 || id1 == 2)) || (id0 == 2 && (id1 == 1 || id1 == 3)) || (id0 == 3 && (id1 == 2 || id1 == 0))) && abs(FT0-FT1)<3000 && isParticleBeta==0 && isBetas==0 && abs(Edep0-Edep1)>500";
     string selectionCrit180 =
-            "((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500 && isParticleBeta==0 && isBetas==0 && hitAng < 130";
+            "((id0==0 && id1==2) || (id0==1 && id1==3) || (id0==2 && id1==0) || (id0==3 && id1==1)) && abs(FT0-FT1)<1500";
     string title0 = "0#circ Coincidences";
     string title90 = "90#circ Coincidences";
     string title180 = "180#circ Coincidences";
@@ -100,6 +100,10 @@ void EnergyDistributions() {
     hist180->SetYTitle(yLabel.c_str());
 
     hist180->SetStats(kFALSE);
+
+    canv180->SetLogz();
+
+    //hist180->GetZaxis()->SetMaxDigits(2);
 
     canv180->Draw();
     if(withColz) {
